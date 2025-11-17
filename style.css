@@ -1,0 +1,146 @@
+body {
+    background: #111;
+    color: white;
+    font-family: Arial, sans-serif;
+}
+
+#container {
+    display: flex;
+    gap: 40px;
+}
+
+#left-panel {
+    width: 300px;
+}
+
+#command {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 15px;
+}
+
+#log {
+    background: #222;
+    padding: 10px;
+    height: 300px;
+    overflow-y: auto;
+    border-radius: 8px;
+}
+
+/* GRID */
+#game-area {
+    display: grid;
+    grid-template-columns: repeat(4, 80px);
+    grid-template-rows: repeat(4, 80px);
+    gap: 6px;
+}
+
+.cell {
+    width: 80px;
+    height: 80px;
+    background: #000;
+    border-radius: 6px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Hall sisu */
+/*
+.cell::after {
+    content: "";
+    position: absolute;
+    width: 80%;
+    height: 80%;
+    background: #444;
+    top: 10%;
+    left: 10%;
+    border-radius: 4px;
+}
+
+/* Player */
+/*
+.player::after {
+    background: white !important;
+    border-radius: 50%;
+}
+
+/* Switch */
+/*
+.switch::after {
+    background: orange !important;
+}
+
+/* Key (kollane) */
+/*
+.key::after {
+    background: yellow !important;
+}
+
+/* Exit (punane/roheline) */
+/*.exit::after {
+    background: red !important;
+}
+
+.exit-open::after {
+    background: green !important;
+}*/
+
+/* kui lightsOn = true */
+.lights-on .cell {
+    background: #d8cba6 !important;
+}
+
+/* väiksem sisuelement ruudu sees */
+.cell-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.player-icon {
+    width: 22px;
+    height: 22px;
+    background: white;
+    border-radius: 50%;
+    position: absolute;
+    bottom: 30px;
+    right: 40px;
+}
+
+.switch-icon {
+    width: 22px;
+    height: 22px;
+    background: orange;
+    border-radius: 4px;
+    position: absolute;
+    top: 6px;
+    left: 6px;
+}
+
+.key-icon {
+    width: 18px;
+    height: 18px;
+    background: yellow;
+    border-radius: 3px;
+    position: absolute;
+    top: 6px;
+    right: 6px;
+}
+
+.exit-icon {
+    width: 40px;
+    height: 5px;
+    background: rgb(152, 65, 35);
+    border-radius: 4px;
+    position: absolute;
+    bottom: 0px;
+    right: 20px;
+    transform-origin: right center;
+}
+
+.exit-icon.open {
+    transform: rotate(60deg);
+    /*background: green !important;*/
+}
