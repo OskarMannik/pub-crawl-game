@@ -1,146 +1,115 @@
 body {
-    background: #111;
-    color: white;
+    margin: 0;
     font-family: Arial, sans-serif;
-}
-
-#container {
-    display: flex;
-    gap: 40px;
-}
-
-#left-panel {
-    width: 300px;
-}
-
-#command {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 15px;
-}
-
-#log {
-    background: #222;
-    padding: 10px;
-    height: 300px;
-    overflow-y: auto;
-    border-radius: 8px;
-}
-
-/* GRID */
-#game-area {
-    display: grid;
-    grid-template-columns: repeat(4, 80px);
-    grid-template-rows: repeat(4, 80px);
-    gap: 6px;
-}
-
-.cell {
-    width: 80px;
-    height: 80px;
-    background: #000;
-    border-radius: 6px;
-    position: relative;
+    background-color: #121212;
+    color: #ffffff;
     display: flex;
     justify-content: center;
     align-items: center;
+    height: 100vh;
+    overflow: hidden;
 }
 
-/* Hall sisu */
-/*
-.cell::after {
-    content: "";
-    position: absolute;
+#game-container {
+    display: flex;
+    flex-direction: column;
     width: 80%;
-    height: 80%;
-    background: #444;
-    top: 10%;
-    left: 10%;
-    border-radius: 4px;
-}
-
-/* Player */
-/*
-.player::after {
-    background: white !important;
-    border-radius: 50%;
-}
-
-/* Switch */
-/*
-.switch::after {
-    background: orange !important;
-}
-
-/* Key (kollane) */
-/*
-.key::after {
-    background: yellow !important;
-}
-
-/* Exit (punane/roheline) */
-/*.exit::after {
-    background: red !important;
-}
-
-.exit-open::after {
-    background: green !important;
-}*/
-
-/* kui lightsOn = true */
-.lights-on .cell {
-    background: #d8cba6 !important;
-}
-
-/* väiksem sisuelement ruudu sees */
-.cell-content {
+    height: 90%;
+    border: 2px solid #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
     position: relative;
-    width: 100%;
-    height: 100%;
 }
 
-.player-icon {
-    width: 22px;
-    height: 22px;
-    background: white;
-    border-radius: 50%;
+#terminal {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: #000000;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+#output {
+    flex: 1;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    font-family: monospace;
+    font-size: 24px;
+    line-height: 1.5;
+}
+
+#input {
+    border: none;
+    padding: 25px;
+    font-size: 24px;
+    font-family: 'Roboto Mono', monospace;
+    background-color: #222222;
+    color: #ffffff;
+    outline: none;
     position: absolute;
-    bottom: 30px;
-    right: 40px;
+    bottom: 10px;
+    left: 10px;
+    width: calc(100% - 500px);
+    max-width: 100%;
+    display: block;
 }
 
-.switch-icon {
-    width: 22px;
-    height: 22px;
-    background: orange;
-    border-radius: 4px;
+#map {
     position: absolute;
-    top: 6px;
-    left: 6px;
+    bottom: 10px;
+    right: 10px;
+    width: 400px;
+    height: 400px;
+    background-color: #333333;
+    border: 2px solid #ffffff;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
-.key-icon {
-    width: 18px;
-    height: 18px;
-    background: yellow;
-    border-radius: 3px;
-    position: absolute;
-    top: 6px;
-    right: 6px;
+#map h3 {
+    margin: 0;
+    font-size: 23px;
+    font-family: 'Roboto Mono', monospace;
 }
 
-.exit-icon {
-    width: 40px;
-    height: 5px;
-    background: rgb(152, 65, 35);
-    border-radius: 4px;
-    position: absolute;
-    bottom: 0px;
-    right: 20px;
-    transform-origin: right center;
+#map-canvas {
+    width: 380px;
+    height: 380px;
+    background-color: #000000;
 }
 
-.exit-icon.open {
-    transform: rotate(60deg);
-    /*background: green !important;*/
+@media (max-width: 768px) {
+
+    body {
+        overflow-x: hidden;
+    }
+
+    #game-container {
+        width: 100%;
+        height: 100%;
+    }
+
+    #input {
+        position: static;
+        width: 100%;
+        padding: 18px;
+        margin-top: 10px;
+        font-size: 20px;
+    }
+
+    #map {
+        position: static;
+        width: 100%;
+        height: auto;
+        margin-top: 10px;
+    }
+
+    #map-canvas {
+        width: 100%;
+        height: auto;
+    }
 }

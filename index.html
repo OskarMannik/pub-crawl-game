@@ -1,29 +1,22 @@
 <!DOCTYPE html>
-<html lang="et">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ARC-AGI-stiilis Tekstimäng</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <title>Text-Based Adventure Game</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>ARC-AGI stiilis tekstipõhine mäng</h1>
-
-    <div id="container">
-
-        <div id="left-panel">
-            <ul>
-                <li><code>up</code></li>
-                <li><code>down</code></li>
-                <li><code>left</code></li>
-                <li><code>right</code></li>
-                <li><code>hit</code></li>
-            </ul>
-
-            <input id="command" type="text" autofocus>
+    <div id="game-container">
+        <div id="terminal">
+            <div id="output"></div>
+            <input type="text" id="input" placeholder="Type your command here...">
         </div>
 
-        <div id="game-area"></div>
-
+        <div id="map">
+            <h3>Map</h3>
+            <canvas id="map-canvas"></canvas>
+        </div>
     </div>
 
     <script src="game.js"></script>
