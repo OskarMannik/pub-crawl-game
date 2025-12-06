@@ -91,11 +91,17 @@ function shuffleArray(array) {
 
 let shuffledQuestions = [];
 
+let viewStartTime = null;
+let viewTotalTime = 0;
+let questionStartTime = null;
+let questionTotalTime = 0;
+
 function showNextItem() {
   const memoryItem = document.getElementById('memory-item');
   const nextBtn = document.getElementById('next-btn');
 
   if (!showingQuestions) {
+    if (viewStartTime === null) viewStartTime = Date.now();
     currentIndex++;
     warningShown = false;
     if (currentIndex < items.length) {
@@ -110,11 +116,15 @@ function showNextItem() {
       memoryItem.innerHTML = html;
       nextBtn.textContent = currentIndex === items.length - 1 ? "Start Questions" : "Next";
     } else {
+      // End of viewing phase
+      viewTotalTime = Math.round((Date.now() - viewStartTime) / 1000);
+      viewStartTime = null;
       showingQuestions = true;
       currentIndex = 0;
       // Shuffle questions before starting
       shuffledQuestions = questions.map((q, idx) => ({...q, origIndex: idx}));
       shuffleArray(shuffledQuestions);
+      questionStartTime = Date.now();
       showQuestion();
     }
   } else {
@@ -131,6 +141,9 @@ function showNextItem() {
       if (currentIndex < shuffledQuestions.length) {
         showQuestion();
       } else {
+        // End of question phase
+        questionTotalTime = Math.round((Date.now() - questionStartTime) / 1000);
+        questionStartTime = null;
         showResults();
       }
       return;
@@ -142,6 +155,9 @@ function showNextItem() {
       if (currentIndex < shuffledQuestions.length) {
         showQuestion();
       } else {
+        // End of question phase
+        questionTotalTime = Math.round((Date.now() - questionStartTime) / 1000);
+        questionStartTime = null;
         showResults();
       }
     }
@@ -170,7 +186,7 @@ function showResults() {
   userAnswers.forEach((ans, i) => {
     if (ans === shuffledQuestions[i].answer) score++;
   });
-  memoryItem.innerHTML = `<div style='font-size:1.5rem;'>Test complete!<br>Your score: ${score} / ${shuffledQuestions.length}</div>`;
+  memoryItem.innerHTML = `<div style='font-size:1.5rem;'>Test complete!<br>Your score: ${score} / ${shuffledQuestions.length}</div><div style='margin-top:18px;font-size:1.1rem;'>Time spent viewing objects: <b>${viewTotalTime}</b> seconds<br>Time spent answering questions: <b>${questionTotalTime}</b> seconds</div>`;
   nextBtn.style.display = "none";
 }
 
