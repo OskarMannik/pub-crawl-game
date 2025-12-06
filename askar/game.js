@@ -90,6 +90,7 @@ function shuffleArray(array) {
 }
 
 let shuffledQuestions = [];
+let shuffledChoices = [];
 
 let viewStartTime = null;
 let viewTotalTime = 0;
@@ -124,6 +125,12 @@ function showNextItem() {
       // Shuffle questions before starting
       shuffledQuestions = questions.map((q, idx) => ({...q, origIndex: idx}));
       shuffleArray(shuffledQuestions);
+      // Shuffle choices for each question and store mapping
+      shuffledChoices = shuffledQuestions.map(q => {
+        const indices = q.choices.map((_, i) => i);
+        shuffleArray(indices);
+        return indices;
+      });
       questionStartTime = Date.now();
       showQuestion();
     }
@@ -168,15 +175,17 @@ function showQuestion() {
   const memoryItem = document.getElementById('memory-item');
   const nextBtn = document.getElementById('next-btn');
   const q = shuffledQuestions[currentIndex];
+  const choiceOrder = shuffledChoices[currentIndex];
   let html = `<div style='margin-bottom:20px;font-size:1.3rem;'>${q.q}</div>`;
-  html += getChoicesHtml(q);
+  html += getChoicesHtml(q, choiceOrder);
   memoryItem.innerHTML = html;
   nextBtn.textContent = currentIndex === shuffledQuestions.length - 1 ? "Finish" : "Next Question";
   warningShown = false;
 }
 
-function getChoicesHtml(q) {
-  return q.choices.map((choice, i) => `<label style='display:block;margin-bottom:10px;'><input type='radio' name='choice' value='${i}'> ${choice}</label>`).join('');
+function getChoicesHtml(q, order) {
+  // order: array of indices for shuffled choices
+  return order.map((origIdx, i) => `<label style='display:block;margin-bottom:10px;'><input type='radio' name='choice' value='${origIdx}'> ${q.choices[origIdx]}</label>`).join('');
 }
 
 function showResults() {
