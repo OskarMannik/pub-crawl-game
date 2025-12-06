@@ -1,16 +1,346 @@
+const locations = {
+    'start': {
+        name: 'START',
+        description: 'You are at the starting point.',
+        isPub: false,
+        connections: {
+            'down': { destination: 'junction1', length: 5 }
+        }
+    },
+    'junction1': {
+        name: 'JUNCTION',
+        description: '',
+        isPub: false,
+        connections: {
+            'up': { destination: 'start', length: 5 },
+            'left': { destination: 'bar_rainbow', length: 15 },
+            'down': { destination: 'pub_acropolis', length: 20 }
+        }
+    },
+    'bar_rainbow': {
+        name: 'Bar Rainbow',
+        //description: 'When you enter bar Rainbow then the first thing you see is a colourful choice of different drinks. They vary from green to red to blue and much more. The whole wall behind the counter is full of shelves, which are filled with the mentioned drinks. The barmen greet you with a big smile and offer you a drink. You refuse kindly (for now) as you have a task to complete and search around for the taskmaster. There are two different rooms you can go to, on the left side there are some tables, a sofa and some chairs and on the right side there is a small dancefloor. You decide to approach the calmer room with the sofa as there seems to be more light and you need light to do your task. The room was very cozy. It does not have a lot of room but just enough to fit a few small groups of people. The walls are dark brown and the ceiling was very high. There was also a minimalist chandelier hanging down from the ceiling, which you found very inspiring. In the corner you notice the taskmaster and he gives you the task. Do you want to start the task? (yes/no)',
+        description: 'placeholder',
+        isPub: true,
+        tasks: [
+            {
+                question: 'How many triangles are formed by letters in the geometric diagram?',
+                image: 'images/bar_rainbow_q1.jpg',
+                correct: '2' // siis kui on vaba tekstiga vastus ehk ilma multiple answerita ss peab olema stringina ja ss ärge answers massiivi lisage
+            },
+            {
+                question: 'Each card has a number on one side and a color on the other side. The rule to test is: “If a card has an even number on one side, then its other side is blue.” Which card or cards do you need to turn over to test whether the rule is true (minimal number of cards)?',
+                image: 'images/bar_rainbow_q2.jpg',
+                answers: ['8, green and blue', '8 and blue', '8 and green', '3 and green'],
+                correct: 2
+            },
+            {
+                question: 'Manny had 3 birthday cookie pies to share with his 24 classmates and his teacher, Mr. Keith. If each of the cookie pies were cut into 10 slices and Manny, his classmates, and Mr. Keith all had 1 piece, how many slices are left?',
+                correct: '4'
+            },
+            {
+                question: 'What is the missing number?',
+                image: 'images/bar_rainbow_q3.jpg',
+                answers: ['20', '14', '13', '12'],
+                correct: 1
+            },
+            {
+                question: 'There are three times as many chairs as tables in a room. If there are 20 pieces of furniture in total, how many chairs are there?',
+                correct: '15'
+            }
+        ],
+        connections: {
+            'up': { destination: 'junction2', length: 5 },
+            'right': { destination: 'junction1', length: 15 }
+        }
+    },
+    'pub_acropolis': {
+        name: 'Pub Acropolis',
+        //description: 'You enter an old looking building which from the outside looks peaceful but when you enter, you realise that it is much more alive than you would have guessed. It is a dark room where RGB lights flash and dance around the walls from time to time. In front of you there stands a tall mirror where people check their outfits and make social media pictures. Instead of the mirror your interest is drawn to the long dance floor. There are multiple tall pillars standing around the room and on the left side of the room there is a counter, which is as long as the whole room. The whole wall behind the counter is a mirror and while looking around you realise that the wall facing the counter is also a huge mirror. In one corner of the counter you see a familiar face and instantly know that he will give you your next task. You make your way towards the person. Do you want to start the task? (yes/no)',
+        description: 'placeholder',
+        isPub: true,
+        tasks: [
+            {
+                question: 'How many pillars are in this room?',
+                image: 'images/pub_acropolis_q1.jpg',
+                answers: ['4', '6', '8', '10'],
+                correct: 1
+            },
+            {
+                question: 'What color is the RGB light currently showing?',
+                image: 'images/pub_acropolis_q2.jpg',
+                answers: ['Red', 'Green', 'Blue', 'Purple'],
+                correct: 3
+            },
+            {
+                question: 'How many mirrors are in the room?',
+                image: 'images/pub_acropolis_q3.jpg',
+                answers: ['Red', 'Green', 'Blue', 'Purple'],
+                correct: 1
+            },
+            {
+                question: 'What shape is the dance floor?',
+                image: 'images/pub_acropolis_q4.jpg',
+                answers: ['Square', 'Rectangle', 'Circle', 'Oval'],
+                correct: 1
+            },
+            {
+                question: 'How long is the counter?',
+                image: 'images/pub_acropolis_q5.jpg',
+                answers: ['Half the room', 'Full room length', '1/3 of room', '2/3 of room'],
+                correct: 1
+            }
+        ],
+        connections: {
+            'up': { destination: 'junction1', length: 20 },
+            'right': { destination: 'junction5', length: 25 },
+            'down': { destination: 'junction3', length: 10 }
+        }
+    },
+    'pub_tropico': {
+        name: 'Pub Tropico',
+        //description: 'From far away you can see a small restaurant next to a bridge. There seems to be a very long line but you still have to complete your task. You walk inside and find yourself in a small but bright bar. On the walls there are a lot of motivational Spanish messages and empty beer bottles that serve a decorative purpose. Shelves behind the beige counter are filled with various tasty beverages. Most of the bottles on the wall are small Mexican beer bottles. On the left hand side you notice a big Jamaican flag hanging from the ceiling and under it stands a table, where your task is set up. You walk towards the task through the bar while listening to the latin tunes coming from the radio. Do you want to start the task? (yes/no)',
+        description: 'placeholder',
+        isPub: true,
+        tasks: [
+            {
+                question: 'What does this Spanish phrase mean?',
+                image: 'images/pub_tropico_q1.jpg',
+                answers: ['Live life', 'Never give up', 'Dream big', 'Be happy'],
+                correct: 1
+            },
+            {
+                question: 'How many beer bottles are on this shelf?',
+                image: 'images/pub_tropico_q2.jpg',
+                answers: ['12', '18', '24', '30'],
+                correct: 2
+            },
+            {
+                question: 'What flag is hanging from the ceiling?',
+                image: 'images/pub_tropico_q3.jpg',
+                answers: ['Mexican', 'Jamaican', 'Cuban', 'Brazilian'],
+                correct: 1
+            },
+            {
+                question: 'What color is the counter?',
+                image: 'images/pub_tropico_q4.jpg',
+                answers: ['White', 'Beige', 'Brown', 'Gray'],
+                correct: 1
+            },
+            {
+                question: 'What type of music is playing?',
+                image: 'images/pub_tropico_q5.jpg',
+                answers: ['Rock', 'Jazz', 'Latin', 'Pop'],
+                correct: 2
+            }
+        ],
+        connections: {
+            'left': { destination: 'junction3', length: 5 }
+        }
+    },
+    'junction2': {
+        name: 'JUNCTION',
+        description: '',
+        isPub: false,
+        connections: {
+            'down': { destination: 'bar_rainbow', length: 5 },
+            'right': { destination: 'junction4', length: 30 }
+        }
+    },
+    'junction4': {
+        name: 'JUNCTION',
+        description: '',
+        isPub: false,
+        connections: {
+            'down': { destination: 'junction5', length: 20 },
+            'right': { destination: 'junction10', length: 5 },
+            'left': { destination: 'junction2', length: 30  }
+        }
+    },
+    'junction3': {
+        name: 'JUNCTION',
+        description: '',
+        isPub: false,
+        connections: {
+            'up': { destination: 'pub_acropolis', length: 10 },
+            'right': { destination: 'pub_tropico', length: 5 }
+        }
+    },
+    'junction5': {
+        name: 'JUNCTION',
+        description: '',
+        isPub: false,
+        connections: {
+            'right': { destination: 'junction8', length: 35 },
+            'down': { destination: 'junction6', length: 20 },
+            'up': { destination: 'junction4', length: 20 },
+            'left': { destination: 'pub_acropolis', length: 25 }
+        }
+    },
+    'bar_amazon': {
+        name: 'Bar Amazon',
+        //description: 'You walk on a wide and loud street that has cars parked all around the edges of the road. High up on the side of a house you see a big sign with a palm leaf on it. This is where you will find your next task. You enter the building and walk up the stairs that lead to a small dimly lighted room. On one side of the room there is a counter, where one can give their coats or jackets and a small corridor that leads to a larger room. The other side of the room has multiple plants besides the wall and a small mirror right at the center. A man greets you and offers to take your coat. You give it to him and continue to the larger room. The larger room has a huge dance floor. On one side of the dance floor there is a stage for bands and artists. The other side is a big area where there are tables, sofas and besides the wall there is a bar counter. The walls are decorated with different impressionistic paintings, which give a fancier feeling to the place.  Under one of the paintings a girl is trying to catch your attention to give you the next task. You approach her and she hands you the task. Do you want to start the task? (yes/no)',
+        description: 'placeholder',
+        isPub: true,
+        tasks: [
+            {
+                question: 'Which artist painted this?',
+                image: 'images/bar_amazon_q1.jpg',
+                answers: ['Monet', 'Renoir', 'Degas', 'Manet'],
+                correct: 0
+            },
+            {
+                question: 'How many plants are beside the wall?',
+                image: 'images/bar_amazon_q2.jpg',
+                answers: ['3', '5', '7', '9'],
+                correct: 1
+            },
+            {
+                question: 'What is on the stage?',
+                image: 'images/bar_amazon_q3.jpg',
+                answers: ['Piano', 'Drums', 'Guitar', 'Microphone'],
+                correct: 2
+            },
+            {
+                question: 'What shape is the mirror?',
+                image: 'images/bar_amazon_q4.jpg',
+                answers: ['Round', 'Square', 'Oval', 'Rectangle'],
+                correct: 0
+            },
+            {
+                question: 'How many impressionistic paintings are visible?',
+                image: 'images/bar_amazon_q5.jpg',
+                answers: ['2', '3', '4', '5'],
+                correct: 1
+            }
+        ],
+        connections: {
+            'up': { destination: 'junction6', length: 10 }
+        }
+    },
+    'the_nature_bar': {
+        name: 'The Nature Bar',
+        //description: 'You find yourself in a quiet bar. Much quieter than the other bars you have visited today. There is a deck next to the bar and a small road that leads to the back of the house and you decide to look for your task outside. The deck is surrounded by a tall wooden fence. From behind the fence you notice some trees. Most of them are birch trees but there are also an oak and two pines. You move around the corner and see a huge group of people. They are surrounding a table tennis player where two tall men are playing. Two people are watching the match from a third floor balcony from the neighbouring house. Next to the group of people there seems to be some other, smaller group. You assume that this is your next task and you assume correctly. The person responsible for the task waves you to come closer and you obey. She gives you the task. Do you want to start the task? (yes/no)',
+        description: 'placeholder',
+        isPub: true,
+        tasks: [
+            {
+                question: 'How many birch trees are visible?',
+                image: 'images/nature_bar_q1.jpg',
+                answers: ['3', '5', '7', '9'],
+                correct: 1
+            },
+            {
+                question: 'How many people are watching from the balcony?',
+                image: 'images/nature_bar_q2.jpg',
+                answers: ['1', '2', '3', '4'],
+                correct: 1
+            },
+            {
+                question: 'What color is the table tennis table?',
+                image: 'images/nature_bar_q3.jpg',
+                answers: ['Blue', 'Green', 'Red', 'Black'],
+                correct: 0
+            },
+            {
+                question: 'What material is the fence made of?',
+                image: 'images/nature_bar_q4.jpg',
+                answers: ['Metal', 'Wood', 'Plastic', 'Brick'],
+                correct: 1
+            },
+            {
+                question: 'How many pine trees are there?',
+                image: 'images/nature_bar_q5.jpg',
+                answers: ['1', '2', '3', '4'],
+                correct: 1
+            }
+        ],
+        connections: {
+            'up': { destination: 'junction10', length: 10 },
+            'right': { destination: 'junction9', length: 5 }
+        }
+    },
+    'junction6': {
+        name: 'JUNCTION',
+        description: '',
+        isPub: false,
+        connections: {
+            'down': { destination: 'bar_amazon', length: 10 },
+            'up': { destination: 'junction5', length: 20 },
+            'right': { destination: 'junction7', length: 30  }
+        }
+    },
+    'junction7': {
+        name: 'JUNCTION',
+        description: '',
+        isPub: false,
+        connections: {
+            'down': { destination: 'finish', length: 10 },
+            'left': { destination: 'junction6', length: 30 },
+            'up': { destination: 'junction8', length: 20 }
+        }
+    },
+    'junction8': {
+        name: 'JUNCTION',
+        description: '',
+        isPub: false,
+        connections: {
+            'down': { destination: 'junction7', length: 20 },
+            'up': { destination: 'junction9', length: 10 },
+            'left': { destination: 'junction5', length: 35 }
+        }
+    },
+    'junction9': {
+        name: 'JUNCTION',
+        description: '',
+        isPub: false,
+        connections: {
+            'down': { destination: 'junction8', length: 10 },
+            'left': { destination: 'the_nature_bar', length: 5 }
+        }
+    },
+    'junction10': {
+        name: 'JUNCTION',
+        description: '',
+        isPub: false,
+        connections: {
+            'left': { destination: 'junction4', length: 5 },
+            'down': { destination: 'the_nature_bar', length: 10 }
+        }
+    },
+    'finish': {
+        name: 'FINISH',
+        description: 'You have reached the finish! Congratulations!',
+        isPub: false,
+        connections: {
+        }
+    }
+};
+
 const gameState = {
-    location: "start",
-    map: {},
+    location: 'start',
+    timeElapsed: 0,
+    maxTime: 280,
+    gameOver: false,
+    isTyping: false,
+    waitingForTaskResponse: false,
+    inTask: false,
+    currentTaskQuestions: [],
+    currentQuestionIndex: 0,
+    currentQuestionMode: null,
+    imageLoadToken: 0,
+    tasksCompleted: 0,
+    totalTasksInPub: 5
 };
 
 function initializeGame() {
-    const output = document.getElementById("output");
     const input = document.getElementById("input");
 
-    typeWriter("Welcome to the Pub Crawl game!\nType 'help' for a list of commands.\n");
+    typeWriter("Welcome to the Pub Crawl game!\nYou have 280 minutes to complete the pub crawl.\nAvailable commands:\n- up, down, left, right: Move in that direction\n- time: Check remaining time\n");
+    drawMap();
 
     input.addEventListener("keydown", (event) => {
-        if (event.key === "Enter") {
+        if (event.key === "Enter" && !gameState.isTyping) {
             const command = input.value.trim();
             input.value = "";
             handleCommand(command);
@@ -18,9 +348,67 @@ function initializeGame() {
     });
 }
 
-function typeWriter(text, speed = 24) {
+function drawMap() { //placeholder tulevikuks kui mapi lisame
+
+}
+
+function displayTaskImage(imageUrl, question, answers) {
+    const canvas = document.getElementById('map');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const token = ++gameState.imageLoadToken;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (!imageUrl) {
+    
+        return;
+    }
+
+    const img = new Image();
+    img.onload = function() {
+        if (gameState.imageLoadToken !== token) return;
+        const maxWidth = canvas.width - 20;
+        const maxHeight = canvas.height - 20;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxWidth) {
+            height = (maxWidth / width) * height;
+            width = maxWidth;
+        }
+        if (height > maxHeight) {
+            width = (maxHeight / height) * width;
+            height = maxHeight;
+        }
+
+        const x = (canvas.width - width) / 2;
+        const y = (canvas.height - height) / 2;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, x, y, width, height);
+    };
+    img.onerror = function() {
+        if (gameState.imageLoadToken !== token) return;
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#00ff00';
+        ctx.font = '16px monospace';
+        ctx.fillText('[Image not available]', 10, 30);
+    };
+    img.src = imageUrl;
+}
+
+function getRandomTasks(tasksArray, count) {
+    const shuffled = [...tasksArray].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, count);
+}
+
+function typeWriter(text, speed = 10) {
     const output = document.getElementById("output");
+    const input = document.getElementById("input");
     let i = 0;
+    gameState.isTyping = true;
+    input.disabled = true;
 
     function typing() {
         output.textContent += text.charAt(i);
@@ -28,20 +416,182 @@ function typeWriter(text, speed = 24) {
         output.scrollTop = output.scrollHeight;
         if (i < text.length) {
             setTimeout(typing, speed);
+        } else {
+            gameState.isTyping = false;
+            input.disabled = false;
+            input.focus();
         }
     }
     typing();
 }
 
+function movePlayer(direction) {
+    if (gameState.gameOver) {
+        typeWriter("\nGame is over. Please refresh to play again.\n");
+        return;
+    }
+
+    const currentLoc = locations[gameState.location];
+    const connection = currentLoc.connections[direction.toLowerCase()];
+
+    if (connection) {
+        const nextLocationKey = connection.destination;
+        const pathLength = connection.length;
+        
+        gameState.timeElapsed += pathLength;
+        gameState.location = nextLocationKey;
+        const newLocation = locations[gameState.location];
+        
+        if (gameState.timeElapsed > gameState.maxTime) {
+            gameState.gameOver = true;
+            typeWriter('\nGAME OVER! You ran out of time!\n');
+        } else if (gameState.location === 'finish') {
+            gameState.gameOver = true;
+            typeWriter(`\nYou have completed the pub crawl in ${gameState.timeElapsed} minutes!\n`);
+        } else {
+            typeWriter(`\nYou moved ${direction} to ${newLocation.name} (${pathLength} minutes walk).\n${newLocation.description}\n`);
+            
+            if (newLocation.isPub) {
+                gameState.waitingForTaskResponse = true;
+            }
+        }
+    } else {
+        typeWriter(`\nYou can't go ${direction} from here.\n`);
+    }
+}
+
+function showNextQuestion() {
+    const question = gameState.currentTaskQuestions[gameState.currentQuestionIndex];
+    displayTaskImage(question.image, question.question, question.answers);
+
+    if (Array.isArray(question.answers) && question.answers.length > 0) {
+        let answersText = `\n${question.question}\n`;
+        question.answers.forEach((answer, index) => {
+            answersText += `${index + 1}. ${answer}\n`;
+        });
+        answersText += `\nEnter your answer (1-${question.answers.length}): `;
+        gameState.currentQuestionMode = 'multiple';
+        typeWriter(answersText);
+    } else {
+        const promptText = `\n${question.question}\n\nEnter your answer: `;
+        gameState.currentQuestionMode = 'text';
+        typeWriter(promptText);
+    }
+}
+
 function handleCommand(command) {
+    const raw = command.trim();
+    const cmd = raw.toLowerCase();
 
-    switch (command.toLowerCase()) {
-        case "help":
-            typeWriter("\nAvailable commands:\n- help: Show this help message\n");
+    if (gameState.inTask) {
+        const currentQuestion = gameState.currentTaskQuestions[gameState.currentQuestionIndex];
+        if (gameState.currentQuestionMode === 'multiple') {
+            const answerIndex = parseInt(cmd) - 1;
+            if (Number.isNaN(answerIndex) || !currentQuestion.answers || answerIndex < 0 || answerIndex >= currentQuestion.answers.length) {
+                typeWriter(`\nPlease enter a valid answer number (1-${currentQuestion.answers ? currentQuestion.answers.length : 4}).\n`);
+                return;
+            }
+
+            const selected = currentQuestion.answers[answerIndex];
+            const correct = currentQuestion.correct;
+
+            let isCorrect = false;
+            if (typeof correct === 'number') {
+                isCorrect = answerIndex === correct;
+            } else if (typeof correct === 'string') {
+                isCorrect = selected && selected.toLowerCase() === correct.toLowerCase();
+            } else if (Array.isArray(correct)) {
+                isCorrect = correct.map(c => c.toLowerCase()).includes(selected.toLowerCase());
+            }
+
+            if (isCorrect) {
+                gameState.tasksCompleted++;
+                typeWriter(`\nCorrect! (${gameState.tasksCompleted}/${gameState.totalTasksInPub})\n`);
+            } else {
+                const correctLabel = (typeof correct === 'number' && currentQuestion.answers) ? currentQuestion.answers[correct] : (Array.isArray(correct) ? correct[0] : (typeof correct === 'string' ? correct : 'N/A'));
+                typeWriter(`\nWrong! The correct answer was: ${correctLabel}\n`);
+            }
+        } else {
+            const correct = currentQuestion.correct;
+            let matched = false;
+
+            const numericInput = parseInt(raw);
+            if (!Number.isNaN(numericInput) && typeof correct === 'number') {
+                matched = (numericInput - 1) === correct;
+            } else if (typeof correct === 'string') {
+                matched = raw.toLowerCase() === correct.toLowerCase();
+            } else if (Array.isArray(correct)) {
+                matched = correct.map(c => c.toLowerCase()).includes(raw.toLowerCase());
+            } else if (typeof correct === 'number' && currentQuestion.answers && currentQuestion.answers[correct]) {
+                matched = raw.toLowerCase() === currentQuestion.answers[correct].toLowerCase();
+            }
+
+            if (matched) {
+                gameState.tasksCompleted++;
+                typeWriter(`\nCorrect! (${gameState.tasksCompleted}/${gameState.totalTasksInPub})\n`);
+            } else {
+                let correctText = '';
+                if (typeof correct === 'string') correctText = correct;
+                else if (Array.isArray(correct)) correctText = correct[0];
+                else if (typeof correct === 'number' && currentQuestion.answers) correctText = currentQuestion.answers[correct];
+                typeWriter(`\nWrong! The correct answer was: ${correctText}\n`);
+            }
+        }
+
+        gameState.currentQuestionIndex++;
+
+        if (gameState.currentQuestionIndex < gameState.currentTaskQuestions.length) {
+            setTimeout(() => showNextQuestion(), 1500);
+        } else {
+            setTimeout(() => {
+                typeWriter(`\nTask completed! You answered ${gameState.tasksCompleted}/${gameState.totalTasksInPub} correctly. Let's continue!\n\nAvailable commands:\n- up, down, left, right: Move in that direction\n- time: Check remaining time\n`);
+                gameState.inTask = false;
+                gameState.currentQuestionMode = null;
+                gameState.tasksCompleted = 0;
+                drawMap();
+            }, 1500);
+        }
+        return;
+    }
+
+    if (gameState.waitingForTaskResponse) {
+        if (cmd === "yes") {
+            gameState.waitingForTaskResponse = false;
+            const currentLocation = locations[gameState.location];
+            gameState.currentTaskQuestions = getRandomTasks(currentLocation.tasks, 5);
+            gameState.currentQuestionIndex = 0;
+            gameState.tasksCompleted = 0;
+            gameState.inTask = true;
+            showNextQuestion();
+        } else if (cmd === "no") {
+            gameState.waitingForTaskResponse = false;
+            typeWriter("\nYou decided not to do the task. You can continue exploring.\n");
+        } else {
+            typeWriter("\nPlease answer 'yes' or 'no'.\n");
+        }
+        return;
+    }
+
+    switch (cmd) {
+        case "look":
+            const currentLocation = locations[gameState.location];
+            typeWriter(`\n${currentLocation.description}\n`);
             break;
-
+        case "location":
+            typeWriter(`\nYou are at: ${locations[gameState.location].name}\n`);
+            break;
+        case "time":
+            const timeRemaining = gameState.maxTime - gameState.timeElapsed;
+            typeWriter(`\nTime remaining: ${timeRemaining} minutes\n`);
+            break;
+        case "up":
+        case "down":
+        case "left":
+        case "right":
+            movePlayer(cmd);
+            break;
         default:
-            typeWriter("\nUnknown command. Type 'help' for a list of commands.\n");
+            typeWriter("\nAvailable commands:\n- up, down, left, right: Move in that direction\n- time: Check remaining time\n");
             break;
     }
 }
