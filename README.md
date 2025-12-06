@@ -1,2 +1,2 @@
 # pub-crawl-game
-Our project for Artificial and Natural Intelligence
+Our project for Artificial and Natural Intelligence.
