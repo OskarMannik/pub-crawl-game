@@ -82,6 +82,15 @@ let showingQuestions = false;
 let userAnswers = [];
 let warningShown = false;
 
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+let shuffledQuestions = [];
+
 function showNextItem() {
   const memoryItem = document.getElementById('memory-item');
   const nextBtn = document.getElementById('next-btn');
@@ -90,39 +99,47 @@ function showNextItem() {
     currentIndex++;
     warningShown = false;
     if (currentIndex < items.length) {
-      memoryItem.textContent = items[currentIndex].text;
+      // Show image if present for this item (by question index)
+      let html = '';
+      const q = questions[currentIndex];
+      if (q && q.image) {
+        const imgPath = `images/${q.image}`;
+        html += `<img src='${imgPath}' alt='item image' style='max-width:200px;max-height:200px;display:block;margin:0 auto 20px auto;' onerror="this.style.display='none'" />`;
+      }
+      html += `<div>${items[currentIndex].text}</div>`;
+      memoryItem.innerHTML = html;
       nextBtn.textContent = currentIndex === items.length - 1 ? "Start Questions" : "Next";
     } else {
       showingQuestions = true;
       currentIndex = 0;
+      // Shuffle questions before starting
+      shuffledQuestions = questions.map((q, idx) => ({...q, origIndex: idx}));
+      shuffleArray(shuffledQuestions);
       showQuestion();
     }
   } else {
     const selected = document.querySelector('input[name="choice"]:checked');
-    // Only show popup if no answer is chosen AND warning hasn't been shown yet
     if (!selected && !warningShown) {
       alert('Please select an answer.');
       warningShown = true;
       return;
     }
-    // If an answer is chosen, proceed and reset warningShown
     if (selected) {
       warningShown = false;
       userAnswers.push(parseInt(selected.value));
       currentIndex++;
-      if (currentIndex < questions.length) {
+      if (currentIndex < shuffledQuestions.length) {
         showQuestion();
       } else {
         showResults();
       }
       return;
     }
-    // If no answer and warning has already been shown, record as unanswered and move on
     if (!selected && warningShown) {
       warningShown = false;
       userAnswers.push(-1);
       currentIndex++;
-      if (currentIndex < questions.length) {
+      if (currentIndex < shuffledQuestions.length) {
         showQuestion();
       } else {
         showResults();
@@ -134,28 +151,11 @@ function showNextItem() {
 function showQuestion() {
   const memoryItem = document.getElementById('memory-item');
   const nextBtn = document.getElementById('next-btn');
-  const q = questions[currentIndex];
+  const q = shuffledQuestions[currentIndex];
   let html = `<div style='margin-bottom:20px;font-size:1.3rem;'>${q.q}</div>`;
-  // Check if image exists
-  const imgPath = `images/${q.image}`;
-  const img = new Image();
-  img.src = imgPath;
-  img.onload = function() {
-    html = `<img src='${imgPath}' alt='question image' style='max-width:200px;max-height:200px;display:block;margin:0 auto 20px auto;' />` + html;
-    html += getChoicesHtml(q);
-    memoryItem.innerHTML = html;
-  };
-  img.onerror = function() {
-    html += getChoicesHtml(q);
-    memoryItem.innerHTML = html;
-  };
-  // If image is cached and loads instantly
-  if (img.complete && img.naturalWidth !== 0) {
-    html = `<img src='${imgPath}' alt='question image' style='max-width:200px;max-height:200px;display:block;margin:0 auto 20px auto;' />` + html;
-    html += getChoicesHtml(q);
-    memoryItem.innerHTML = html;
-  }
-  nextBtn.textContent = currentIndex === questions.length - 1 ? "Finish" : "Next Question";
+  html += getChoicesHtml(q);
+  memoryItem.innerHTML = html;
+  nextBtn.textContent = currentIndex === shuffledQuestions.length - 1 ? "Finish" : "Next Question";
   warningShown = false;
 }
 
@@ -168,9 +168,9 @@ function showResults() {
   const nextBtn = document.getElementById('next-btn');
   let score = 0;
   userAnswers.forEach((ans, i) => {
-    if (ans === questions[i].answer) score++;
+    if (ans === shuffledQuestions[i].answer) score++;
   });
-  memoryItem.innerHTML = `<div style='font-size:1.5rem;'>Test complete!<br>Your score: ${score} / ${questions.length}</div>`;
+  memoryItem.innerHTML = `<div style='font-size:1.5rem;'>Test complete!<br>Your score: ${score} / ${shuffledQuestions.length}</div>`;
   nextBtn.style.display = "none";
 }
 
