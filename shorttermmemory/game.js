@@ -1,4 +1,4 @@
-// Logic functions for Askar's Pub Crawl game
+// Logic functions for shorttermmemory Pub Crawl game
 // Add game logic here as needed
 
 const items = [
