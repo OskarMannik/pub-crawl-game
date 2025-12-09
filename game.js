@@ -348,7 +348,33 @@ function initializeGame() {
     });
 }
 
-function drawMap() { //placeholder tulevikuks kui mapi lisame
+function drawMap() {
+    const canvas = document.getElementById('map');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const token = ++gameState.imageLoadToken;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const img = new Image();
+    img.onload = function() {
+        if (gameState.imageLoadToken !== token) return;
+        const maxWidth = canvas.width * 0.95;
+        const maxHeight = canvas.height;
+        let width = img.width;
+        let height = img.height;
+
+        const ratio = Math.min(maxWidth / width, maxHeight / height, 1);
+        width = width * ratio;
+        height = height * ratio;
+
+        const x = (canvas.width - width) / 2;
+        const y = (canvas.height - height) / 2;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, x, y, width, height);
+    };
+    
+    img.src = 'images/map.png';
 
 }
 
