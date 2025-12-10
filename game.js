@@ -274,6 +274,8 @@ const gameState = {
 
 function initializeGame() {
     const input = document.getElementById("input");
+    // configure canvas for high-DPI screens before any drawing
+    setupCanvasForHiDPI();
 
     typeWriter("Welcome to the Pub Crawl game!\nYou have 280 minutes to complete the pub crawl.\nAvailable commands:\n- up, down, left, right: Move in that direction\n- time: Check remaining time\n");
     drawMap();
@@ -287,6 +289,33 @@ function initializeGame() {
     });
 }
 
+// Configure the main canvas so drawings are sharp on high-DPI displays.
+function setupCanvasForHiDPI() {
+    const canvas = document.getElementById('map');
+    if (!canvas) return;
+    const dpr = window.devicePixelRatio || 1;
+    // Get CSS size in pixels
+    const rect = canvas.getBoundingClientRect();
+    const cssWidth = Math.max(1, Math.round(rect.width)) || canvas.width;
+    const cssHeight = Math.max(1, Math.round(rect.height)) || canvas.height;
+
+    // Resize the backing store to DPR-scaled size
+    canvas.width = Math.round(cssWidth * dpr);
+    canvas.height = Math.round(cssHeight * dpr);
+    // Keep the element at the CSS size
+    canvas.style.width = cssWidth + 'px';
+    canvas.style.height = cssHeight + 'px';
+
+    const ctx = canvas.getContext('2d');
+    // Scale user-space to CSS pixels so existing drawing code can use CSS coordinates
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+// Reconfigure canvas on resize to keep it sharp
+window.addEventListener('resize', () => {
+    try { setupCanvasForHiDPI(); } catch (e) {}
+});
+
 function drawMap() {
     const canvas = document.getElementById('map');
     if (!canvas) return;
@@ -297,20 +326,30 @@ function drawMap() {
     const img = new Image();
     img.onload = function() {
         if (gameState.imageLoadToken !== token) return;
-        const maxWidth = canvas.width * 0.95;
-        const maxHeight = canvas.height;
-        let width = img.width;
-        let height = img.height;
+        // Draw using backing-pixel coordinates (avoid transform issues)
+        const backingW = canvas.width;
+        const backingH = canvas.height;
+        const margin = Math.round(10 * (window.devicePixelRatio || 1));
 
-        const ratio = Math.min(maxWidth / width, maxHeight / height, 1);
-        width = width * ratio;
-        height = height * ratio;
+        const maxDestW = Math.max(1, backingW - margin * 2);
+        const maxDestH = Math.max(1, backingH - margin * 2);
+        const naturalW = img.naturalWidth || img.width;
+        const naturalH = img.naturalHeight || img.height;
+        const scale = Math.min(maxDestW / naturalW, maxDestH / naturalH);
+        const dw = Math.max(1, Math.round(naturalW * scale));
+        const dh = Math.max(1, Math.round(naturalH * scale));
+        const dx = Math.round((backingW - dw) / 2);
+        const dy = Math.round((backingH - dh) / 2);
 
-        const x = (canvas.width - width) / 2;
-        const y = (canvas.height - height) / 2;
-
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, x, y, width, height);
+        try {
+            ctx.save();
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.clearRect(0, 0, backingW, backingH);
+            ctx.imageSmoothingEnabled = true;
+            ctx.drawImage(img, 0, 0, naturalW, naturalH, dx, dy, dw, dh);
+        } finally {
+            ctx.restore();
+        }
     };
     
     img.src = 'images/map.png';
@@ -322,7 +361,11 @@ function displayTaskImage(imageUrl, question, answers) {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     const token = ++gameState.imageLoadToken;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // use CSS pixel sizes for layout (user-space is scaled by setupCanvasForHiDPI)
+    const rect = canvas.getBoundingClientRect();
+    const cssWidth = Math.max(1, Math.round(rect.width));
+    const cssHeight = Math.max(1, Math.round(rect.height));
+    ctx.clearRect(0, 0, cssWidth, cssHeight);
 
     // If no imageUrl provided but question (text) is provided, draw the text on the canvas.
     if (!imageUrl) {
@@ -330,12 +373,12 @@ function displayTaskImage(imageUrl, question, answers) {
         if (question && question.length > 0) {
             // Draw wrapped, readable text on canvas (white on dark background)
             ctx.fillStyle = '#000000';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillRect(0, 0, cssWidth, cssHeight);
             ctx.fillStyle = '#ffffff';
             const padding = 12;
-            const maxWidth = canvas.width - padding * 2;
+            const maxWidth = cssWidth - padding * 2;
             const lineHeight = 26;
-            // Use a larger font to improve visibility
+            // Use a larger font to improve visibility (CSS pixels)
             ctx.font = '20px monospace';
             ctx.textBaseline = 'top';
 
@@ -357,7 +400,7 @@ function displayTaskImage(imageUrl, question, answers) {
         } else {
             // nothing to draw — show placeholder to make it obvious
             ctx.fillStyle = '#000000';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillRect(0, 0, cssWidth, cssHeight);
             ctx.fillStyle = '#ffffff';
             ctx.font = '18px monospace';
             ctx.fillText('[No text to display]', 12, 12);
@@ -368,30 +411,36 @@ function displayTaskImage(imageUrl, question, answers) {
     const img = new Image();
     img.onload = function() {
         if (gameState.imageLoadToken !== token) return;
-        const maxWidth = canvas.width - 20;
-        const maxHeight = canvas.height - 20;
-        let width = img.width;
-        let height = img.height;
+        // We'll draw using backing-pixel coordinates to avoid transform/rounding issues.
+        const backingW = canvas.width;
+        const backingH = canvas.height;
+        const margin = 10 * (window.devicePixelRatio || 1);
 
-        if (width > maxWidth) {
-            height = (maxWidth / width) * height;
-            width = maxWidth;
+        const maxDestW = Math.max(1, backingW - margin * 2);
+        const maxDestH = Math.max(1, backingH - margin * 2);
+        const naturalW = img.naturalWidth || img.width;
+        const naturalH = img.naturalHeight || img.height;
+        const scale = Math.min(maxDestW / naturalW, maxDestH / naturalH);
+        const dw = Math.max(1, Math.round(naturalW * scale));
+        const dh = Math.max(1, Math.round(naturalH * scale));
+        const dx = Math.round((backingW - dw) / 2);
+        const dy = Math.round((backingH - dh) / 2);
+
+        // draw using identity transform into backing buffer
+        try {
+            ctx.save();
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.clearRect(0, 0, backingW, backingH);
+            ctx.imageSmoothingEnabled = true;
+            ctx.drawImage(img, 0, 0, naturalW, naturalH, dx, dy, dw, dh);
+        } finally {
+            ctx.restore();
         }
-        if (height > maxHeight) {
-            width = (maxHeight / height) * width;
-            height = maxHeight;
-        }
-
-        const x = (canvas.width - width) / 2;
-        const y = (canvas.height - height) / 2;
-
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, x, y, width, height);
     };
     img.onerror = function() {
         if (gameState.imageLoadToken !== token) return;
         ctx.fillStyle = '#000000';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillRect(0, 0, cssWidth, cssHeight);
         ctx.fillStyle = '#00ff00';
         ctx.font = '16px monospace';
         ctx.fillText('[Image not available]', 10, 30);

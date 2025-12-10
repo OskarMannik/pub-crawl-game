@@ -92,12 +92,18 @@ function drawGridToCanvas() {
     const canvas = document.getElementById('map');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    const cellW = Math.floor(canvas.width / 4);
-    const cellH = Math.floor(canvas.height / 4);
+    // Use CSS pixel sizes (user-space) so HiDPI transform is handled by setupCanvasForHiDPI
+    const rect = canvas.getBoundingClientRect();
+    const cssWidth = Math.max(1, Math.round(rect.width));
+    const cssHeight = Math.max(1, Math.round(rect.height));
+    const cellW = Math.floor(cssWidth / 4);
+    const cellH = Math.floor(cssHeight / 4);
 
     // background
     ctx.fillStyle = lightsOn ? '#ffffff' : '#111111';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillRect(0, 0, cssWidth, cssHeight);
+    // Prefer crisp rendering for this grid
+    ctx.imageSmoothingEnabled = false;
 
     for (let y = 0; y < 4; y++) {
         for (let x = 0; x < 4; x++) {
@@ -106,7 +112,7 @@ function drawGridToCanvas() {
 
             // cell background
             ctx.fillStyle = '#222';
-            ctx.fillRect(cx + 2, cy + 2, cellW - 4, cellH - 4);
+                ctx.fillRect(cx + 2, cy + 2, cellW - 4, cellH - 4);
 
             // switch icon (only visible when player in same cell)
             if (map[y][x] === 'switch' && x === playerX && y === playerY) {
