@@ -20,7 +20,7 @@ const locations = {
     'bar_rainbow': {
         name: 'Bar Rainbow',
         //description: 'When you enter bar Rainbow then the first thing you see is a colourful choice of different drinks. They vary from green to red to blue and much more. The whole wall behind the counter is full of shelves, which are filled with the mentioned drinks. The barmen greet you with a big smile and offer you a drink. You refuse kindly (for now) as you have a task to complete and search around for the taskmaster. There are two different rooms you can go to, on the left side there are some tables, a sofa and some chairs and on the right side there is a small dancefloor. You decide to approach the calmer room with the sofa as there seems to be more light and you need light to do your task. The room was very cozy. It does not have a lot of room but just enough to fit a few small groups of people. The walls are dark brown and the ceiling was very high. There was also a minimalist chandelier hanging down from the ceiling, which you found very inspiring. In the corner you notice the taskmaster and he gives you the task. Do you want to start the task? (yes/no)',
-        description: 'placeholder',
+        description: 'When you enter bar Rainbow then the first thing you see is a colourful choice of different drinks. They vary from green to red to blue and much more. The whole wall behind the counter is full of shelves, which are filled with the mentioned drinks. The barmen greet you with a big smile and offer you a drink. You refuse kindly (for now) as you have a task to complete and search around for the taskmaster. There are two different rooms you can go to, on the left side there are some tables, a sofa and some chairs and on the right side there is a small dancefloor. You decide to approach the calmer room with the sofa as there seems to be more light and you need light to do your task. The room was very cozy. It does not have a lot of room but just enough to fit a few small groups of people. The walls are dark brown and the ceiling was very high. There was also a minimalist chandelier hanging down from the ceiling, which you found very inspiring. In the corner you notice the taskmaster and he gives you the task. Do you want to start the task? (yes/no)',
         isPub: true,
         tasks: [
             {
@@ -57,7 +57,7 @@ const locations = {
     'pub_acropolis': {
         name: 'Pub Acropolis',
         //description: 'You enter an old looking building which from the outside looks peaceful but when you enter, you realise that it is much more alive than you would have guessed. It is a dark room where RGB lights flash and dance around the walls from time to time. In front of you there stands a tall mirror where people check their outfits and make social media pictures. Instead of the mirror your interest is drawn to the long dance floor. There are multiple tall pillars standing around the room and on the left side of the room there is a counter, which is as long as the whole room. The whole wall behind the counter is a mirror and while looking around you realise that the wall facing the counter is also a huge mirror. In one corner of the counter you see a familiar face and instantly know that he will give you your next task. You make your way towards the person. Do you want to start the task? (yes/no)',
-        description: 'placeholder',
+        description: 'You enter an old looking building which from the outside looks peaceful but when you enter, you realise that it is much more alive than you would have guessed. It is a dark room where RGB lights flash and dance around the walls from time to time. In front of you there stands a tall mirror where people check their outfits and make social media pictures. Instead of the mirror your interest is drawn to the long dance floor. There are multiple tall pillars standing around the room and on the left side of the room there is a counter, which is as long as the whole room. The whole wall behind the counter is a mirror and while looking around you realise that the wall facing the counter is also a huge mirror. In one corner of the counter you see a familiar face and instantly know that he will give you your next task. You make your way towards the person. Do you want to start the task? (yes/no)',
         isPub: true,
         // Note: tasks removed — Acropolis uses the shorttermmemory integration instead
         connections: {
@@ -69,40 +69,9 @@ const locations = {
     'pub_tropico': {
         name: 'Pub Tropico',
         //description: 'From far away you can see a small restaurant next to a bridge. There seems to be a very long line but you still have to complete your task. You walk inside and find yourself in a small but bright bar. On the walls there are a lot of motivational Spanish messages and empty beer bottles that serve a decorative purpose. Shelves behind the beige counter are filled with various tasty beverages. Most of the bottles on the wall are small Mexican beer bottles. On the left hand side you notice a big Jamaican flag hanging from the ceiling and under it stands a table, where your task is set up. You walk towards the task through the bar while listening to the latin tunes coming from the radio. Do you want to start the task? (yes/no)',
-        description: 'placeholder',
-        isPub: true,
-        tasks: [
-            {
-                question: 'What does this Spanish phrase mean?',
-                image: 'images/pub_tropico_q1.jpg',
-                answers: ['Live life', 'Never give up', 'Dream big', 'Be happy'],
-                correct: 1
-            },
-            {
-                question: 'How many beer bottles are on this shelf?',
-                image: 'images/pub_tropico_q2.jpg',
-                answers: ['12', '18', '24', '30'],
-                correct: 2
-            },
-            {
-                question: 'What flag is hanging from the ceiling?',
-                image: 'images/pub_tropico_q3.jpg',
-                answers: ['Mexican', 'Jamaican', 'Cuban', 'Brazilian'],
-                correct: 1
-            },
-            {
-                question: 'What color is the counter?',
-                image: 'images/pub_tropico_q4.jpg',
-                answers: ['White', 'Beige', 'Brown', 'Gray'],
-                correct: 1
-            },
-            {
-                question: 'What type of music is playing?',
-                image: 'images/pub_tropico_q5.jpg',
-                answers: ['Rock', 'Jazz', 'Latin', 'Pop'],
-                correct: 2
-            }
-        ],
+        description: 'From far away you can see a small restaurant next to a bridge. There seems to be a very long line but you still have to complete your task. You walk inside and find yourself in a small but bright bar. On the walls there are a lot of motivational Spanish messages and empty beer bottles that serve a decorative purpose. Shelves behind the beige counter are filled with various tasty beverages. Most of the bottles on the wall are small Mexican beer bottles. On the left hand side you notice a big Jamaican flag hanging from the ceiling and under it stands a table, where your task is set up. You walk towards the task through the bar while listening to the latin tunes coming from the radio. Do you want to start the task? (yes/no)'
+        ,isPub: true,
+        // Note: tasks removed — Tropico uses the shorttermmemory integration instead
         connections: {
             'left': { destination: 'junction3', length: 5 }
         }
@@ -149,7 +118,7 @@ const locations = {
     'bar_amazon': {
         name: 'Bar Amazon',
         //description: 'You walk on a wide and loud street that has cars parked all around the edges of the road. High up on the side of a house you see a big sign with a palm leaf on it. This is where you will find your next task. You enter the building and walk up the stairs that lead to a small dimly lighted room. On one side of the room there is a counter, where one can give their coats or jackets and a small corridor that leads to a larger room. The other side of the room has multiple plants besides the wall and a small mirror right at the center. A man greets you and offers to take your coat. You give it to him and continue to the larger room. The larger room has a huge dance floor. On one side of the dance floor there is a stage for bands and artists. The other side is a big area where there are tables, sofas and besides the wall there is a bar counter. The walls are decorated with different impressionistic paintings, which give a fancier feeling to the place.  Under one of the paintings a girl is trying to catch your attention to give you the next task. You approach her and she hands you the task. Do you want to start the task? (yes/no)',
-        description: 'placeholder',
+        description: 'You walk on a wide and loud street that has cars parked all around the edges of the road. High up on the side of a house you see a big sign with a palm leaf on it. This is where you will find your next task. You enter the building and walk up the stairs that lead to a small dimly lighted room. On one side of the room there is a counter, where one can give their coats or jackets and a small corridor that leads to a larger room. The other side of the room has multiple plants besides the wall and a small mirror right at the center. A man greets you and offers to take your coat. You give it to him and continue to the larger room. The larger room has a huge dance floor. On one side of the dance floor there is a stage for bands and artists. The other side is a big area where there are tables, sofas and besides the wall there is a bar counter. The walls are decorated with different impressionistic paintings, which give a fancier feeling to the place.  Under one of the paintings a girl is trying to catch your attention to give you the next task. You approach her and she hands you the task. Do you want to start the task? (yes/no)',
         isPub: true,
         tasks: [
             {
@@ -190,7 +159,7 @@ const locations = {
     'the_nature_bar': {
         name: 'The Nature Bar',
         //description: 'You find yourself in a quiet bar. Much quieter than the other bars you have visited today. There is a deck next to the bar and a small road that leads to the back of the house and you decide to look for your task outside. The deck is surrounded by a tall wooden fence. From behind the fence you notice some trees. Most of them are birch trees but there are also an oak and two pines. You move around the corner and see a huge group of people. They are surrounding a table tennis player where two tall men are playing. Two people are watching the match from a third floor balcony from the neighbouring house. Next to the group of people there seems to be some other, smaller group. You assume that this is your next task and you assume correctly. The person responsible for the task waves you to come closer and you obey. She gives you the task. Do you want to start the task? (yes/no)',
-        description: 'placeholder',
+        description: 'You find yourself in a quiet bar. Much quieter than the other bars you have visited today. There is a deck next to the bar and a small road that leads to the back of the house and you decide to look for your task outside. The deck is surrounded by a tall wooden fence. From behind the fence you notice some trees. Most of them are birch trees but there are also an oak and two pines. You move around the corner and see a huge group of people. They are surrounding a table tennis player where two tall men are playing. Two people are watching the match from a third floor balcony from the neighbouring house. Next to the group of people there seems to be some other, smaller group. You assume that this is your next task and you assume correctly. The person responsible for the task waves you to come closer and you obey. She gives you the task. Do you want to start the task? (yes/no)',
         isPub: true,
         tasks: [
             {
@@ -746,7 +715,7 @@ function handleCommand(command) {
     if (gameState.waitingForTaskResponse) {
         if (cmd === "yes") {
             // If at Pub Acropolis, run shorttermmemory integration
-            if (gameState.location === 'pub_acropolis') {
+            if (gameState.location === 'pub_tropico') {
                 startShortTermMemoryTask();
             } else {
                 gameState.waitingForTaskResponse = false;
