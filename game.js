@@ -528,6 +528,59 @@ function showNextMemoryItem() {
     }
 }
 
+// --- Tom's mini-game integration for `bar_amazon` ---
+function startTomGameAtAmazon() {
+    // Ensure tom game globals exist
+    if (typeof processCommand !== 'function' || typeof drawGrid !== 'function') {
+        // fallback to normal task behaviour
+        const currentLocation = locations[gameState.location];
+        gameState.currentTaskQuestions = getRandomTasks(currentLocation.tasks, 5);
+        gameState.currentQuestionIndex = 0;
+        gameState.tasksCompleted = 0;
+        gameState.inTask = true;
+        showNextQuestion();
+        return;
+    }
+
+    gameState.waitingForTaskResponse = false;
+    gameState.inTomGame = true;
+    // show instructions and initial canvas render
+    typeWriter("\nStarting mini-game: use `up`, `down`, `left`, `right` to move and `hit` to interact. Type `quit` to exit the mini-game.\n");
+    // save current canvas state so we can restore it after quitting
+    try {
+        const canvas = document.getElementById('map');
+        if (canvas && canvas.getContext) {
+            const ctx = canvas.getContext('2d');
+            gameState.tomCanvasBackup = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        }
+    } catch (e) {
+        console.warn('Could not backup canvas before Tom game', e);
+    }
+
+    // draw initial tom game view to canvas
+    try { drawGrid(); } catch (e) {}
+}
+
+function stopTomGame() {
+    gameState.inTomGame = false;
+    typeWriter("\nExiting mini-game. You may continue exploring.\n");
+    // restore prior canvas snapshot if we saved one
+    try {
+        const canvas = document.getElementById('map');
+        if (canvas && canvas.getContext && gameState.tomCanvasBackup) {
+            const ctx = canvas.getContext('2d');
+            ctx.putImageData(gameState.tomCanvasBackup, 0, 0);
+            delete gameState.tomCanvasBackup;
+            return;
+        }
+    } catch (e) {
+        console.warn('Could not restore canvas after Tom game', e);
+    }
+
+    // fallback: clear canvas area to avoid showing lingering state
+    displayTaskImage(null);
+}
+
 function typeWriter(text, speed = 10) {
     // Queue texts so multiple typeWriter calls don't interleave
     const enqueue = (t, s) => {
@@ -712,11 +765,33 @@ function handleCommand(command) {
         return;
     }
 
+    // If we're inside Tom's mini-game, route commands to its processor
+    if (gameState.inTomGame) {
+        // allow quitting the mini-game
+        if (cmd === 'quit' || cmd === 'exit') {
+            stopTomGame();
+            return;
+        }
+        // forward allowed commands to tom's processCommand
+        try {
+            if (typeof processCommand === 'function') {
+                processCommand(cmd);
+                // redraw handled by tom.drawGrid which updates the main canvas
+            }
+        } catch (e) {
+            console.error('Tom game command error', e);
+        }
+        return;
+    }
+
     if (gameState.waitingForTaskResponse) {
         if (cmd === "yes") {
-            // If at Pub Acropolis, run shorttermmemory integration
+            // If at Pub Tropico, run shorttermmemory integration
             if (gameState.location === 'pub_tropico') {
                 startShortTermMemoryTask();
+            } else if (gameState.location === 'bar_amazon') {
+                // start Tom's mini-game integration at Bar Amazon
+                startTomGameAtAmazon();
             } else {
                 gameState.waitingForTaskResponse = false;
                 const currentLocation = locations[gameState.location];
