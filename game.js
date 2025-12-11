@@ -163,34 +163,31 @@ const locations = {
         isPub: true,
         tasks: [
             {
-                question: 'How many birch trees are visible?',
+                question: 'What is the longest?',
                 image: 'images/nature_bar_q1.jpg',
-                answers: ['3', '5', '7', '9'],
+                answers: ['a', 'b', 'c'],
                 correct: 1
             },
             {
-                question: 'How many people are watching from the balcony?',
+                question: 'What is in the jar?',
                 image: 'images/nature_bar_q2.jpg',
-                answers: ['1', '2', '3', '4'],
-                correct: 1
+                correct: 'honey'
             },
             {
-                question: 'What color is the table tennis table?',
+                question: 'How many fairy lights are in the picture?',
                 image: 'images/nature_bar_q3.jpg',
-                answers: ['Blue', 'Green', 'Red', 'Black'],
-                correct: 0
+                correct: '0' // peab lisama ka zero vastuse
             },
             {
-                question: 'What material is the fence made of?',
+                question: 'What doesn’t belong?',
                 image: 'images/nature_bar_q4.jpg',
-                answers: ['Metal', 'Wood', 'Plastic', 'Brick'],
-                correct: 1
+                answers: ['a', 'b', 'c', 'd', 'e'],
+                correct: 4
             },
             {
-                question: 'How many pine trees are there?',
+                question: 'What is the biggest number?',
                 image: 'images/nature_bar_q5.jpg',
-                answers: ['1', '2', '3', '4'],
-                correct: 1
+                correct: '260'
             }
         ],
         connections: {
@@ -274,8 +271,6 @@ const gameState = {
 
 function initializeGame() {
     const input = document.getElementById("input");
-    // configure canvas for high-DPI screens before any drawing
-    setupCanvasForHiDPI();
 
     typeWriter("Welcome to the Pub Crawl game!\nYou have 280 minutes to complete the pub crawl.\nAvailable commands:\n- up, down, left, right: Move in that direction\n- time: Check remaining time\n");
     drawMap();
@@ -289,67 +284,45 @@ function initializeGame() {
     });
 }
 
-// Configure the main canvas so drawings are sharp on high-DPI displays.
-function setupCanvasForHiDPI() {
-    const canvas = document.getElementById('map');
-    if (!canvas) return;
-    const dpr = window.devicePixelRatio || 1;
-    // Get CSS size in pixels
-    const rect = canvas.getBoundingClientRect();
-    const cssWidth = Math.max(1, Math.round(rect.width)) || canvas.width;
-    const cssHeight = Math.max(1, Math.round(rect.height)) || canvas.height;
-
-    // Resize the backing store to DPR-scaled size
-    canvas.width = Math.round(cssWidth * dpr);
-    canvas.height = Math.round(cssHeight * dpr);
-    // Keep the element at the CSS size
-    canvas.style.width = cssWidth + 'px';
-    canvas.style.height = cssHeight + 'px';
-
-    const ctx = canvas.getContext('2d');
-    // Scale user-space to CSS pixels so existing drawing code can use CSS coordinates
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-}
-
-// Reconfigure canvas on resize to keep it sharp
-window.addEventListener('resize', () => {
-    try { setupCanvasForHiDPI(); } catch (e) {}
-});
-
 function drawMap() {
     const canvas = document.getElementById('map');
     if (!canvas) return;
+
+    // Size the backing canvas for HiDPI so drawing is crisp
+    const rect = canvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.max(1, Math.round(rect.width * dpr));
+    canvas.height = Math.max(1, Math.round(rect.height * dpr));
+    canvas.style.width = rect.width + 'px';
+    canvas.style.height = rect.height + 'px';
+
     const ctx = canvas.getContext('2d');
+    // Map user-space to CSS pixels
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.imageSmoothingEnabled = true;
+    try { ctx.imageSmoothingQuality = 'high'; } catch (e) {}
+
     const token = ++gameState.imageLoadToken;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, rect.width, rect.height);
 
     const img = new Image();
     img.onload = function() {
         if (gameState.imageLoadToken !== token) return;
-        // Draw using backing-pixel coordinates (avoid transform issues)
-        const backingW = canvas.width;
-        const backingH = canvas.height;
-        const margin = Math.round(10 * (window.devicePixelRatio || 1));
-
-        const maxDestW = Math.max(1, backingW - margin * 2);
-        const maxDestH = Math.max(1, backingH - margin * 2);
         const naturalW = img.naturalWidth || img.width;
         const naturalH = img.naturalHeight || img.height;
-        const scale = Math.min(maxDestW / naturalW, maxDestH / naturalH);
-        const dw = Math.max(1, Math.round(naturalW * scale));
-        const dh = Math.max(1, Math.round(naturalH * scale));
-        const dx = Math.round((backingW - dw) / 2);
-        const dy = Math.round((backingH - dh) / 2);
 
-        try {
-            ctx.save();
-            ctx.setTransform(1, 0, 0, 1, 0, 0);
-            ctx.clearRect(0, 0, backingW, backingH);
-            ctx.imageSmoothingEnabled = true;
-            ctx.drawImage(img, 0, 0, naturalW, naturalH, dx, dy, dw, dh);
-        } finally {
-            ctx.restore();
-        }
+        // Compute COVER scale but slightly reduce it (95%) so the map isn't fully zoomed to the edges.
+        // Clamp to 1 to avoid upscaling small images.
+        const coverScale = Math.max(rect.width / naturalW, rect.height / naturalH);
+        const scale = Math.min(1, coverScale * 0.95);
+
+        const drawW = Math.round(naturalW * scale);
+        const drawH = Math.round(naturalH * scale);
+        const x = Math.round((rect.width - drawW) / 2);
+        const y = Math.round((rect.height - drawH) / 2);
+
+        ctx.clearRect(0, 0, rect.width, rect.height);
+        ctx.drawImage(img, 0, 0, naturalW, naturalH, x, y, drawW, drawH);
     };
     
     img.src = 'images/map.png';
@@ -361,30 +334,46 @@ function displayTaskImage(imageUrl, question, answers) {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     const token = ++gameState.imageLoadToken;
-    // use CSS pixel sizes for layout (user-space is scaled by setupCanvasForHiDPI)
-    const rect = canvas.getBoundingClientRect();
-    const cssWidth = Math.max(1, Math.round(rect.width));
-    const cssHeight = Math.max(1, Math.round(rect.height));
-    ctx.clearRect(0, 0, cssWidth, cssHeight);
+    // Use the canvas content box size (clientWidth/clientHeight) so borders/padding are respected.
+    const cssW = Math.max(1, Math.round(canvas.clientWidth || canvas.width || 300));
+    const cssH = Math.max(1, Math.round(canvas.clientHeight || canvas.height || 150));
+    const dpr = window.devicePixelRatio || 1;
+    const backingW = Math.max(1, Math.round(cssW * dpr));
+    const backingH = Math.max(1, Math.round(cssH * dpr));
 
-    // If no imageUrl provided but question (text) is provided, draw the text on the canvas.
+    // Ensure backing buffer matches the visible content box to avoid drawing into borders
+    if (canvas.width !== backingW || canvas.height !== backingH) {
+        canvas.width = backingW;
+        canvas.height = backingH;
+        canvas.style.width = cssW + 'px';
+        canvas.style.height = cssH + 'px';
+    }
+
+    // Clear using backing coordinates (set identity transform temporarily)
+    try {
+        ctx.save();
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.clearRect(0, 0, backingW, backingH);
+    } finally { ctx.restore(); }
+
+    // If no imageUrl provided but question (text) is provided, draw the text on the canvas (use CSS coords)
     if (!imageUrl) {
-        // draw text on canvas when no image provided
-        if (question && question.length > 0) {
-            // Draw wrapped, readable text on canvas (white on dark background)
+        try {
+            ctx.save();
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
             ctx.fillStyle = '#000000';
-            ctx.fillRect(0, 0, cssWidth, cssHeight);
+            ctx.fillRect(0, 0, backingW, backingH);
             ctx.fillStyle = '#ffffff';
-            const padding = 12;
-            const maxWidth = cssWidth - padding * 2;
-            const lineHeight = 26;
-            // Use a larger font to improve visibility (CSS pixels)
-            ctx.font = '20px monospace';
+            const padding = Math.round(12 * dpr);
+            ctx.font = `${Math.round(20 * dpr)}px monospace`;
             ctx.textBaseline = 'top';
 
-            const words = String(question).split(' ');
+            // Simple wrapping using measureText on backing canvas
+            const words = String(question || '').split(' ');
             let line = '';
             let y = padding;
+            const maxWidth = backingW - padding * 2;
+            const lineHeight = Math.round(26 * dpr);
             for (let n = 0; n < words.length; n++) {
                 const testLine = line + (line ? ' ' : '') + words[n];
                 const testWidth = ctx.measureText(testLine).width;
@@ -397,53 +386,37 @@ function displayTaskImage(imageUrl, question, answers) {
                 }
             }
             if (line) ctx.fillText(line, padding, y);
-        } else {
-            // nothing to draw — show placeholder to make it obvious
-            ctx.fillStyle = '#000000';
-            ctx.fillRect(0, 0, cssWidth, cssHeight);
-            ctx.fillStyle = '#ffffff';
-            ctx.font = '18px monospace';
-            ctx.fillText('[No text to display]', 12, 12);
-        }
+        } finally { ctx.restore(); }
         return;
     }
 
     const img = new Image();
     img.onload = function() {
         if (gameState.imageLoadToken !== token) return;
-        // We'll draw using backing-pixel coordinates to avoid transform/rounding issues.
-        const backingW = canvas.width;
-        const backingH = canvas.height;
-        const margin = 10 * (window.devicePixelRatio || 1);
 
-        const maxDestW = Math.max(1, backingW - margin * 2);
-        const maxDestH = Math.max(1, backingH - margin * 2);
         const naturalW = img.naturalWidth || img.width;
         const naturalH = img.naturalHeight || img.height;
-        const scale = Math.min(maxDestW / naturalW, maxDestH / naturalH);
+
+        // Compute scale to fit inside (contain), allow downscale but prevent upscaling beyond 1.0
+        const scale = Math.min(1, Math.min(backingW / naturalW, backingH / naturalH));
         const dw = Math.max(1, Math.round(naturalW * scale));
         const dh = Math.max(1, Math.round(naturalH * scale));
         const dx = Math.round((backingW - dw) / 2);
         const dy = Math.round((backingH - dh) / 2);
 
-        // draw using identity transform into backing buffer
         try {
             ctx.save();
+            // draw in backing coordinates (1:1 pixels)
             ctx.setTransform(1, 0, 0, 1, 0, 0);
             ctx.clearRect(0, 0, backingW, backingH);
             ctx.imageSmoothingEnabled = true;
+            try { ctx.imageSmoothingQuality = 'high'; } catch (e) {}
             ctx.drawImage(img, 0, 0, naturalW, naturalH, dx, dy, dw, dh);
-        } finally {
-            ctx.restore();
-        }
+        } finally { ctx.restore(); }
     };
     img.onerror = function() {
         if (gameState.imageLoadToken !== token) return;
-        ctx.fillStyle = '#000000';
-        ctx.fillRect(0, 0, cssWidth, cssHeight);
-        ctx.fillStyle = '#00ff00';
-        ctx.font = '16px monospace';
-        ctx.fillText('[Image not available]', 10, 30);
+        try { ctx.save(); ctx.setTransform(1,0,0,1,0,0); ctx.fillStyle = '#000000'; ctx.fillRect(0,0,backingW,backingH); ctx.fillStyle='#00ff00'; ctx.font = `${Math.round(16*dpr)}px monospace`; ctx.fillText('[Image not available]', Math.round(10*dpr), Math.round(30*dpr)); } finally { ctx.restore(); }
     };
     img.src = imageUrl;
 }
