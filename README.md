@@ -21,7 +21,7 @@ Scoring and time
 - You must complete all tasks and reach the finish within 280 minutes of in-game time.
 
 Running the game
-- Visit the live game at: [https://oskarmanning.github.io/pub-crawl-game/](https://oskarmanning.github.io/pub-crawl-game/)
+- Visit the live game at: [https://oskarmannik.github.io/pub-crawl-game/](https://oskarmannik.github.io/pub-crawl-game/)
 - Use the input box to enter commands and follow the prompts.
 
 Good luck — be attentive and manage your time!
