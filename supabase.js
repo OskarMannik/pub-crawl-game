@@ -60,18 +60,24 @@ async function saveAnswer(sessionId, pubName, question, userAnswer, correctAnswe
 }
 
 //updates session info
-async function updateGameSession(sessionId, score, tasksCompleted, totalTasks, timeElapsed, isFinished) {
+async function updateGameSession(sessionId, score, tasksCompleted, totalTasks, timeElapsed, isFinished, endingReason = null) {
     if (!supabaseClient || !sessionId) return;
+
+    const updateData = { 
+        score: score, 
+        tasks_completed: tasksCompleted, 
+        total_tasks: totalTasks,
+        time_elapsed: timeElapsed,
+        is_finished: isFinished
+    };
+
+    if (endingReason) {
+        updateData.ending_reason = endingReason;
+    }
 
     const { error } = await supabaseClient
         .from('game_sessions')
-        .update({ 
-            score: score, 
-            tasks_completed: tasksCompleted, 
-            total_tasks: totalTasks,
-            time_elapsed: timeElapsed,
-            is_finished: isFinished
-        })
+        .update(updateData)
         .eq('id', sessionId);
 
     if (error) {

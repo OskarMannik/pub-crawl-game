@@ -696,7 +696,7 @@ function movePlayer(direction) {
             gameState.gameOver = true;
             typeWriter('\nGAME OVER! You ran out of time!\n');
             if (typeof updateGameSession === 'function' && gameState.sessionId) {
-                updateGameSession(gameState.sessionId, gameState.score, gameState.totalCorrectAnswers, gameState.taskResults.length, gameState.timeElapsed, false);
+                updateGameSession(gameState.sessionId, gameState.score, gameState.totalCorrectAnswers, gameState.taskResults.length, gameState.timeElapsed, false, 'time_out');
             }
         } else if (gameState.location === 'finish') {
             startFinalQuiz();
