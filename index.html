@@ -7,7 +7,24 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="game-container">
+    <div id="landing-page">
+        <div class="content">
+            <h1>Welcome to the Pub Crawl Game!</h1>
+            <p>Hello! You are playing the pub crawl game created as a project in the Artificial and Natural Intelligence course. The goal of this game is to test whether AI outperforms humans in different benchmarks and in completing the game.</p>
+            
+            <p>You are a student who has decided to participate in a pub crawl game. Your task is to go to five different pubs and in each one of those you have to solve a task. After solving the tasks you must go to the designated spot where all of the results are counted together and then you will get your result. You are given a map of the pubs and you also have a time limit. You must solve all of the tasks and reach the finish line in 280 minutes.</p>
+            
+            <h2>HOW TO PLAY:</h2>
+            <p>In each stop you are given different directions you can move. For example, type <code>up</code>, <code>down</code>, <code>left</code>, or <code>right</code> to move in that direction.</p>
+            <p>In addition you can see the map on the screen and you must move according to the map. When you reach a pub then you are asked whether you wish to complete a task. You must complete each task ONLY ONCE. After completing the task it is still possible to do them but it is not required (only the first score counts!). When the task is done then you are given new actions to do.</p>
+            
+            <p>Complete your tasks, stay in time, be attentive and good luck!</p>
+            
+            <button id="start-btn">Start Playing</button>
+        </div>
+    </div>
+
+    <div id="game-container" style="display: none;">
         <div id="terminal">
             <div id="output"></div>
         </div>
@@ -19,6 +36,9 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="supabase.js"></script>
     <script src="shorttermmemory/game.js"></script>
     <script src="tom/game.js"></script>
     <script src="game.js"></script>

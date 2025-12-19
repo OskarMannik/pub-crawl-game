@@ -12,6 +12,7 @@ let playerY = 2;
 let lightsOn = false;
 let keyFound = false;
 let exitOpen = false;
+let gameWon = false;
 
 //const log = document.getElementById("log");
 
@@ -133,6 +134,11 @@ function drawGridToCanvas() {
                 ctx.strokeStyle = exitOpen ? '#00ff00' : '#888888';
                 ctx.lineWidth = 3;
                 ctx.strokeRect(cx + 6, cy + 6, cellW - 12, cellH - 12);
+                if (gameWon) {
+                    ctx.fillStyle = '#00ff00';
+                    ctx.font = '20px sans-serif';
+                    ctx.fillText('WIN', cx + 10, cy + cellH/2);
+                }
             }
 
             // player
@@ -148,7 +154,7 @@ function drawGridToCanvas() {
 
 
 // MÄNGU ESIALGNE SEIS
-drawGrid();
+// drawGrid();
 
 // KÄSKUDE TÖÖTLEMINE
 function processCommand(cmd) {
@@ -197,10 +203,13 @@ function useHit() {
         return;
     }
 
-    if (map[playerY][playerX] === "exit" && keyFound) {
-        exitOpen = true;
-        drawGrid();
-        return;
+    if (map[playerY][playerX] === "exit") {
+        if (keyFound || exitOpen) {
+            exitOpen = true;
+            gameWon = true;
+            drawGrid();
+            return;
+        }
     }
 
     return;

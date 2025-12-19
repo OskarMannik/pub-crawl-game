@@ -204,3 +204,80 @@ body {
         height: 100%;
     }
 }
+
+#landing-page {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #121212;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    overflow-y: auto;
+}
+
+#landing-page .content {
+    background-color: #000000;
+    padding: 40px;
+    border: 2px solid #ffffff;
+    border-radius: 8px;
+    max-width: 800px;
+    width: 90%;
+    color: #ffffff;
+    font-family: monospace;
+    line-height: 1.6;
+}
+
+#landing-page h1 {
+    color: #ffffff;
+    margin-top: 0;
+    text-transform: uppercase;
+    border-bottom: 1px solid #ffffff;
+    padding-bottom: 10px;
+}
+
+#landing-page h2 {
+    color: #ffffff;
+    margin-top: 20px;
+    text-transform: uppercase;
+}
+
+#landing-page p {
+    margin-bottom: 15px;
+    font-size: 20px;
+}
+
+#landing-page code {
+    background-color: #222;
+    padding: 2px 5px;
+    border: 1px solid #555;
+    border-radius: 4px;
+    font-family: 'Roboto Mono', monospace;
+    color: #ffffff;
+}
+
+#start-btn {
+    background-color: #222222;
+    color: #ffffff;
+    border: 2px solid #ffffff;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 20px;
+    margin-top: 20px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-family: 'Roboto Mono', monospace;
+    transition: background-color 0.3s, color 0.3s;
+    width: 100%;
+    text-transform: uppercase;
+}
+
+#start-btn:hover {
+    background-color: #ffffff;
+    color: #000000;
+}
