@@ -24,4 +24,4 @@ Running the game
 - Visit the live game at: [https://oskarmannik.github.io/pub-crawl-game/](https://oskarmannik.github.io/pub-crawl-game/)
 - Use the input box to enter commands and follow the prompts.
 
-Good luck — be attentive and manage your time!
+Good luck — be attentive and manage your time! 
