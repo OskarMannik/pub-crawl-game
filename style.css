@@ -214,9 +214,11 @@ body {
     background-color: #121212;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     z-index: 1000;
     overflow-y: auto;
+    padding-top: 20px;
+    padding-bottom: 20px;
 }
 
 #landing-page .content {
@@ -280,4 +282,111 @@ body {
 #start-btn:hover {
     background-color: #ffffff;
     color: #000000;
+}
+
+/* Responsive styles for landing page on smaller screens */
+@media (max-width: 1024px) {
+    #landing-page .content {
+        padding: 30px;
+        max-width: 700px;
+    }
+
+    #landing-page h1 {
+        font-size: 24px;
+    }
+
+    #landing-page h2 {
+        font-size: 18px;
+    }
+
+    #landing-page p {
+        font-size: 16px;
+        margin-bottom: 12px;
+    }
+
+    #start-btn {
+        font-size: 16px;
+        padding: 12px 24px;
+    }
+}
+
+@media (max-width: 768px) {
+    #landing-page .content {
+        padding: 20px;
+        max-width: 90%;
+        width: 95%;
+    }
+
+    #landing-page h1 {
+        font-size: 20px;
+        padding-bottom: 8px;
+        margin-bottom: 10px;
+    }
+
+    #landing-page h2 {
+        font-size: 16px;
+        margin-top: 15px;
+        margin-bottom: 8px;
+    }
+
+    #landing-page p {
+        font-size: 14px;
+        margin-bottom: 10px;
+        line-height: 1.5;
+    }
+
+    #landing-page code {
+        font-size: 12px;
+        padding: 2px 4px;
+    }
+
+    #start-btn {
+        font-size: 14px;
+        padding: 10px 20px;
+        margin-top: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    #landing-page {
+        padding: 15px 0;
+        align-items: flex-start;
+    }
+
+    #landing-page .content {
+        padding: 15px;
+        max-width: 100%;
+        width: 98%;
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+
+    #landing-page h1 {
+        font-size: 18px;
+        padding-bottom: 6px;
+        margin: 0 0 8px 0;
+    }
+
+    #landing-page h2 {
+        font-size: 14px;
+        margin-top: 12px;
+        margin-bottom: 6px;
+    }
+
+    #landing-page p {
+        font-size: 12px;
+        margin-bottom: 8px;
+        line-height: 1.4;
+    }
+
+    #landing-page code {
+        font-size: 11px;
+        padding: 1px 3px;
+    }
+
+    #start-btn {
+        font-size: 12px;
+        padding: 8px 16px;
+        margin-top: 12px;
+    }
 }
