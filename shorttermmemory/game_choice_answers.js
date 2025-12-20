@@ -17,52 +17,62 @@ const items = [
 const questions = [
   {
     q: 'What color was the circle?',
-    answers: ['Red'],
+    choices: ['Red', 'Green', 'Blue', 'Yellow'],
+    answer: 0,
     image: 'question1.jpg'
   },
   {
     q: "What was the street's name?",
-    answers: ['Riia', 'Riia street', 'Riia street 10', 'Riia St', 'Riia St.', 'Riia 10'],
+    choices: ['Riia', 'Rapla', 'Tallinna', 'Rakvere'],
+    answer: 0,
     image: 'question2.jpg'
   },
   {
     q: 'What clothing was there?',
-    answers: ['Sweater', 'Yellow sweater','Pullover','Jumper'],
+    choices: ['Sweater', 'Shoes', 'Necklace', 'Jeans'],
+    answer: 0,
     image: 'question3.jpg'
   },
   {
     q: 'From which terminal did the plane leave?',
-    answers: ['D', 'Terminal D'],
+    choices: ['A', 'B', 'C', 'D'],
+    answer: 3,
     image: 'question4.jpg'
   },
   {
     q: 'What was the fruit?',
-    answers: ['Apple'],
+    choices: ['Apple', 'Orange', 'Banana', 'Grapes'],
+    answer: 0,
     image: 'question5.jpg'
   },
   {
     q: "What color was John's hair?",
-    answers: ['Brown'],
+    choices: ['Brown', 'Blonde', 'Black', 'Gray'],
+    answer: 0,
     image: 'question6.jpg'
   },
   {
     q: 'What was the animal?',
-    answers: ['Rabbit'],
+    choices: ['Rabbit', 'Horse', 'Dog', 'Cow'],
+    answer: 0,
     image: 'question7.jpg'
   },
   {
     q: 'Which exit from the roundabout did you have to take?',
-    answers: ['Second', '2', '2nd'],
+    choices: ['First', 'Second', 'Third', 'Fourth'],
+    answer: 1,
     image: 'question8.jpg'
   },
   {
     q: 'What color was the square?',
-    answers: ['Green'],
+    choices: ['Red', 'Green', 'Blue', 'Yellow'],
+    answer: 1,
     image: 'question9.jpg'
   },
   {
-    q: 'What was the four digit number?',
-    answers: ['0451', '451'],
+    q: 'What was the number?',
+    choices: ['0451', '1450', '5041', '5041'],
+    answer: 0,
     image: 'question10.jpg'
   }
 ];
@@ -80,6 +90,7 @@ function shuffleArray(array) {
 }
 
 let shuffledQuestions = [];
+let shuffledChoices = [];
 
 let viewStartTime = null;
 let viewTotalTime = 0;
@@ -114,22 +125,25 @@ function showNextItem() {
       // Shuffle questions before starting
       shuffledQuestions = questions.map((q, idx) => ({...q, origIndex: idx}));
       shuffleArray(shuffledQuestions);
+      // Shuffle choices for each question and store mapping
+      shuffledChoices = shuffledQuestions.map(q => {
+        const indices = q.choices.map((_, i) => i);
+        shuffleArray(indices);
+        return indices;
+      });
       questionStartTime = Date.now();
       showQuestion();
     }
   } else {
-    const inputField = document.getElementById('answer-input');
-    const userAnswer = inputField ? inputField.value.trim() : '';
-    
-    if (!userAnswer && !warningShown) {
-      alert('Please enter an answer.');
+    const selected = document.querySelector('input[name="choice"]:checked');
+    if (!selected && !warningShown) {
+      alert('Please select an answer.');
       warningShown = true;
       return;
     }
-    
-    if (userAnswer) {
+    if (selected) {
       warningShown = false;
-      userAnswers.push(userAnswer);
+      userAnswers.push(parseInt(selected.value));
       currentIndex++;
       if (currentIndex < shuffledQuestions.length) {
         showQuestion();
@@ -141,10 +155,9 @@ function showNextItem() {
       }
       return;
     }
-    
-    if (!userAnswer && warningShown) {
+    if (!selected && warningShown) {
       warningShown = false;
-      userAnswers.push('');
+      userAnswers.push(-1);
       currentIndex++;
       if (currentIndex < shuffledQuestions.length) {
         showQuestion();
@@ -162,24 +175,17 @@ function showQuestion() {
   const memoryItem = document.getElementById('memory-item');
   const nextBtn = document.getElementById('next-btn');
   const q = shuffledQuestions[currentIndex];
+  const choiceOrder = shuffledChoices[currentIndex];
   let html = `<div style='margin-bottom:20px;font-size:1.3rem;'>${q.q}</div>`;
-  html += `<input type='text' id='answer-input' placeholder='Type your answer here' style='padding:10px;font-size:1rem;width:300px;max-width:100%;margin-bottom:20px;' autofocus />`;
+  html += getChoicesHtml(q, choiceOrder);
   memoryItem.innerHTML = html;
   nextBtn.textContent = currentIndex === shuffledQuestions.length - 1 ? "Finish" : "Next Question";
   warningShown = false;
-  // Focus on input field for better UX
-  setTimeout(() => {
-    const input = document.getElementById('answer-input');
-    if (input) {
-      input.focus();
-      // Allow Enter key to submit answer
-      input.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-          document.getElementById('next-btn').click();
-        }
-      });
-    }
-  }, 0);
+}
+
+function getChoicesHtml(q, order) {
+  // order: array of indices for shuffled choices
+  return order.map((origIdx, i) => `<label style='display:block;margin-bottom:10px;'><input type='radio' name='choice' value='${origIdx}'> ${q.choices[origIdx]}</label>`).join('');
 }
 
 function showResults() {
@@ -187,18 +193,11 @@ function showResults() {
   const nextBtn = document.getElementById('next-btn');
   let score = 0;
   userAnswers.forEach((ans, i) => {
-    // Check if user's answer matches any of the acceptable answers (case-insensitive)
-    const isCorrect = shuffledQuestions[i].answers.some(
-      correctAns => ans.toLowerCase() === correctAns.toLowerCase()
-    );
-    if (isCorrect) {
-      score++;
-    }
+    if (ans === shuffledQuestions[i].answer) score++;
   });
   memoryItem.innerHTML = `<div style='font-size:1.5rem;'>Test complete!<br>Your score: ${score} / ${shuffledQuestions.length}</div><div style='margin-top:18px;font-size:1.1rem;'>Time spent viewing objects: <b>${viewTotalTime}</b> seconds<br>Time spent answering questions: <b>${questionTotalTime}</b> seconds</div>`;
   nextBtn.style.display = "none";
 }
-
 
 document.addEventListener('DOMContentLoaded', function() {
   const nextBtn = document.getElementById('next-btn');

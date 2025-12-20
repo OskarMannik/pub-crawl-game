@@ -470,7 +470,8 @@ function startShortTermMemoryTask() {
         viewStartTime: Date.now(),
         viewTotalTime: 0,
         shuffledQuestions: [],
-        shuffledChoices: [],
+        // DEPRECATED: shuffledChoices only used in old version with multiple choice
+        // shuffledChoices: [],
         userAnswers: []
     };
 
@@ -525,7 +526,8 @@ function showNextMemoryItem() {
         // Clear canvas so objects are not visible during question phase
         displayTaskImage(null);
 
-        // Prepare shuffled questions and choices for the answering phase
+        // Prepare shuffled questions for the answering phase
+        // NEW VERSION: questions use text answers directly from answers array
         mem.shuffledQuestions = mem.questions.map((q, idx) => ({...q, origIndex: idx}));
         // simple Fisher-Yates shuffle
         for (let i = mem.shuffledQuestions.length - 1; i > 0; i--) {
@@ -533,6 +535,7 @@ function showNextMemoryItem() {
             [mem.shuffledQuestions[i], mem.shuffledQuestions[j]] = [mem.shuffledQuestions[j], mem.shuffledQuestions[i]];
         }
 
+        /* DEPRECATED: Old version code with multiple choice shuffling
         // For each question, shuffle choices and map correct index
         mem.shuffledChoices = mem.shuffledQuestions.map(q => {
             const indices = q.choices.map((_, i) => i);
@@ -555,6 +558,18 @@ function showNextMemoryItem() {
                 image: null,
                 answers: answers,
                 correct: newCorrect
+            };
+        });
+        */
+
+        // NEW VERSION: Build questions in format expected by showNextQuestion with text answers
+        gameState.currentTaskQuestions = mem.shuffledQuestions.map((q) => {
+            return {
+                question: q.q || '',
+                // Do not show object/question images during the answering phase for shorttermmemory task
+                image: null,
+                answers: q.answers || [],  // Array of acceptable answers
+                correct: q.answers || []   // Store all acceptable answers for comparison
             };
         });
 
@@ -731,7 +746,27 @@ function showNextQuestion() {
     const question = gameState.currentTaskQuestions[gameState.currentQuestionIndex];
     displayTaskImage(question.image, question.image ? question.question : null, question.answers);
 
-    if (Array.isArray(question.answers) && question.answers.length > 0) {
+    // NEW VERSION: Check if this is a shorttermmemory question (correct is an array of acceptable answers)
+    const isShortTermMemoryQuestion = Array.isArray(question.correct) && question.correct.length > 0;
+    
+    if (isShortTermMemoryQuestion) {
+        // NEW VERSION: Text input mode for shorttermmemory
+        const promptText = `\n${question.question}\n\nEnter your answer: `;
+        gameState.currentQuestionMode = 'text';
+        typeWriter(promptText);
+    }
+    /* DEPRECATED: Old logic for multiple choice
+    else if (Array.isArray(question.answers) && question.answers.length > 0) {
+        let answersText = `\n${question.question}\n`;
+        question.answers.forEach((answer, index) => {
+            answersText += `${index + 1}. ${answer}\n`;
+        });
+        answersText += `\nEnter your answer (1-${question.answers.length}): `;
+        gameState.currentQuestionMode = 'multiple';
+        typeWriter(answersText);
+    }
+    */
+    else if (Array.isArray(question.answers) && question.answers.length > 0) {
         let answersText = `\n${question.question}\n`;
         question.answers.forEach((answer, index) => {
             answersText += `${index + 1}. ${answer}\n`;
@@ -804,6 +839,7 @@ function handleCommand(command) {
                 }
             }
         } else {
+            // NEW VERSION: Handle text input answers (including shorttermmemory with multiple acceptable answers)
             const correct = currentQuestion.correct;
             let matched = false;
 
@@ -813,6 +849,7 @@ function handleCommand(command) {
             } else if (typeof correct === 'string') {
                 matched = raw.toLowerCase() === correct.toLowerCase();
             } else if (Array.isArray(correct)) {
+                // NEW VERSION: Multiple acceptable answers - check if user answer matches any
                 matched = correct.map(c => c.toLowerCase()).includes(raw.toLowerCase());
             } else if (typeof correct === 'number' && currentQuestion.answers && currentQuestion.answers[correct]) {
                 matched = raw.toLowerCase() === currentQuestion.answers[correct].toLowerCase();
@@ -829,9 +866,10 @@ function handleCommand(command) {
                 }
                 typeWriter(`\nCorrect! (${gameState.tasksCompleted}/${gameState.totalTasksInPub})\n`);
             } else {
+                // NEW VERSION: Format correct answer display for multiple acceptable answers
                 let correctText = '';
                 if (typeof correct === 'string') correctText = correct;
-                else if (Array.isArray(correct)) correctText = correct[0];
+                else if (Array.isArray(correct)) correctText = correct.slice(0, 3).join(', '); // Show first 3 options
                 else if (typeof correct === 'number' && currentQuestion.answers) correctText = currentQuestion.answers[correct];
                 typeWriter(`\nWrong! The correct answer was: ${correctText}\n`);
             }
