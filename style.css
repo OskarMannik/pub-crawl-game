@@ -80,7 +80,7 @@ body {
 }
 
 #question-container {
-    display: none; 
+    display: none; /* Initially hidden */
     background-color: #000000;
     color: #ffffff;
     border: 2px solid #ffffff;
@@ -117,6 +117,53 @@ body {
     color: #000000;
 }
 
+#question-container button:focus {
+    outline: 2px solid #ffffff;
+}
+
+/* Media Queries */
+@media (max-width: 1024px) {
+    #game-container {
+        flex-direction: column;
+        width: 90%;
+        height: 95%;
+    }
+
+    #terminal {
+        flex: 1;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    #output {
+        margin-bottom: 0;
+        font-size: 18px;
+    }
+
+    #input {
+        position: static;
+        font-size: 18px;
+        padding: 20px;
+        margin-top: 10px;
+    }
+
+    #map-container {
+        flex: 1;
+        width: 100%;
+        height: auto;
+        min-height: 280px;
+    }
+
+    #map {
+        width: 100%;
+        height: 100%;
+    }
+
+    #question-container {
+        max-width: 90%;
+        width: 90%;
+    }
+}
 
 @media (max-width: 768px) {
     body {
@@ -216,6 +263,7 @@ body {
     }
 }
 
+/* Landing Page */
 #landing-page {
     position: fixed;
     top: 0;
@@ -295,85 +343,6 @@ body {
     color: #000000;
 }
 
-
-
-@media (max-width: 768px) {
-    #landing-page .content {
-        padding: 20px;
-        max-width: 90%;
-        width: 95%;
-    }
-
-    #landing-page h1 {
-        font-size: 20px;
-        padding-bottom: 8px;
-        margin-bottom: 10px;
-    }
-
-    #landing-page h2 {
-        font-size: 16px;
-        margin-top: 15px;
-        margin-bottom: 8px;
-    }
-
-    #landing-page p {
-        font-size: 14px;
-        margin-bottom: 10px;
-        line-height: 1.5;
-    }
-
-    #landing-page code {
-        font-size: 12px;
-        padding: 2px 4px;
-    }
-
-    #start-btn {
-        font-size: 14px;
-        padding: 10px 20px;
-        margin-top: 15px;
-    }
-}
-
-@media (max-width: 480px) {
-    #landing-page {
-        padding: 15px 0;
-        align-items: flex-start;
-    }
-
-    #landing-page .content {
-        padding: 15px;
-        max-width: 100%;
-        width: 98%;
-        margin-top: 0;
-        margin-bottom: 0;
-    }
-
-    #landing-page h1 {
-        font-size: 18px;
-        padding-bottom: 6px;
-        margin: 0 0 8px 0;
-    }
-
-    #landing-page h2 {
-        font-size: 14px;
-        margin-top: 12px;
-        margin-bottom: 6px;
-    }
-
-    #landing-page p {
-        font-size: 12px;
-        margin-bottom: 8px;
-        line-height: 1.4;
-    }
-
-    #landing-page code {
-        font-size: 11px;
-        padding: 1px 3px;
-    }
-
-    #start-btn {
-        font-size: 12px;
-        padding: 8px 16px;
-        margin-top: 12px;
-    }
+#start-btn:focus {
+    outline: 2px solid #ffffff;
 }
