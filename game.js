@@ -269,7 +269,8 @@ const gameState = {
     taskResults: [],
     sessionId: null,
     completedPubs: [],
-    sessionCreationStarted: false
+    sessionCreationStarted: false,
+    isFirstTime: null,
 };
 
 function initializeGame() {
@@ -287,7 +288,7 @@ function initializeGame() {
             // create session
             if (!gameState.sessionId && !gameState.sessionCreationStarted && typeof createGameSession === 'function') {
                 gameState.sessionCreationStarted = true;
-                createGameSession(gameState.playerType).then(id => gameState.sessionId = id);
+                createGameSession(gameState.playerType, gameState.isFirstTime).then(id => gameState.sessionId = id);
             }
 
             handleCommand(command);
@@ -535,34 +536,7 @@ function showNextMemoryItem() {
             [mem.shuffledQuestions[i], mem.shuffledQuestions[j]] = [mem.shuffledQuestions[j], mem.shuffledQuestions[i]];
         }
 
-        /* DEPRECATED: Old version code with multiple choice shuffling
-        // For each question, shuffle choices and map correct index
-        mem.shuffledChoices = mem.shuffledQuestions.map(q => {
-            const indices = q.choices.map((_, i) => i);
-            for (let i = indices.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [indices[i], indices[j]] = [indices[j], indices[i]];
-            }
-            return indices;
-        });
-
-        // Build questions in format expected by showNextQuestion
-        gameState.currentTaskQuestions = mem.shuffledQuestions.map((q, qi) => {
-            const order = mem.shuffledChoices[qi];
-            const answers = order.map(origIdx => q.choices[origIdx]);
-            // find new correct index
-            const newCorrect = order.indexOf(q.answer);
-            return {
-                question: q.q || '',
-                // Do not show object/question images during the answering phase for shorttermmemory task
-                image: null,
-                answers: answers,
-                correct: newCorrect
-            };
-        });
-        */
-
-        // NEW VERSION: Build questions in format expected by showNextQuestion with text answers
+        
         gameState.currentTaskQuestions = mem.shuffledQuestions.map((q) => {
             return {
                 question: q.q || '',
@@ -746,26 +720,14 @@ function showNextQuestion() {
     const question = gameState.currentTaskQuestions[gameState.currentQuestionIndex];
     displayTaskImage(question.image, question.image ? question.question : null, question.answers);
 
-    // NEW VERSION: Check if this is a shorttermmemory question (correct is an array of acceptable answers)
     const isShortTermMemoryQuestion = Array.isArray(question.correct) && question.correct.length > 0;
     
     if (isShortTermMemoryQuestion) {
-        // NEW VERSION: Text input mode for shorttermmemory
         const promptText = `\n${question.question}\n\nEnter your answer: `;
         gameState.currentQuestionMode = 'text';
         typeWriter(promptText);
     }
-    /* DEPRECATED: Old logic for multiple choice
-    else if (Array.isArray(question.answers) && question.answers.length > 0) {
-        let answersText = `\n${question.question}\n`;
-        question.answers.forEach((answer, index) => {
-            answersText += `${index + 1}. ${answer}\n`;
-        });
-        answersText += `\nEnter your answer (1-${question.answers.length}): `;
-        gameState.currentQuestionMode = 'multiple';
-        typeWriter(answersText);
-    }
-    */
+
     else if (Array.isArray(question.answers) && question.answers.length > 0) {
         let answersText = `\n${question.question}\n`;
         question.answers.forEach((answer, index) => {
@@ -1088,12 +1050,27 @@ function startFinalQuiz() {
 
 window.onload = function() {
     const startBtn = document.getElementById('start-btn');
+    const questionContainer = document.getElementById('question-container');
+    const yesBtn = document.getElementById('yes-btn');
+    const noBtn = document.getElementById('no-btn');
+
     if (startBtn) {
         startBtn.addEventListener('click', function() {
             document.getElementById('landing-page').style.display = 'none';
-            document.getElementById('game-container').style.display = 'flex';
-            initializeGame();
+            questionContainer.style.display = 'block';
         });
+
+        const startGame = (isFirstTime) => {
+            questionContainer.style.display = 'none';
+            document.getElementById('game-container').style.display = 'flex';
+
+            gameState.isFirstTime = isFirstTime;
+
+            initializeGame();
+        };
+
+        yesBtn.addEventListener('click', () => startGame(true));
+        noBtn.addEventListener('click', () => startGame(false));
     } else {
         initializeGame();
     }

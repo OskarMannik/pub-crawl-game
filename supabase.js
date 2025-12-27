@@ -9,7 +9,7 @@ if (typeof supabase !== 'undefined' && typeof SUPABASE_CONFIG !== 'undefined') {
 }
 
 //creates initial session
-async function createGameSession(playerType) {
+async function createGameSession(playerType, isFirstTime) {
     if (!supabaseClient) {
         console.error('Supabase not initialized');
         return null;
@@ -20,6 +20,7 @@ async function createGameSession(playerType) {
         .insert([
             { 
                 player_type: playerType,
+                is_first_time: isFirstTime,
                 score: 0,
                 tasks_completed: 0,
                 total_tasks: 0,
