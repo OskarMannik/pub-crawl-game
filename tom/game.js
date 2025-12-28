@@ -93,16 +93,29 @@ function drawGridToCanvas() {
     const canvas = document.getElementById('map');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    // Use CSS pixel sizes (user-space) so HiDPI transform is handled by setupCanvasForHiDPI
+    // Match main game scaling: account for zoom and HiDPI
     const rect = canvas.getBoundingClientRect();
-    const cssWidth = Math.max(1, Math.round(rect.width));
-    const cssHeight = Math.max(1, Math.round(rect.height));
-    const cellW = Math.floor(cssWidth / 4);
-    const cellH = Math.floor(cssHeight / 4);
+    const zoomFactor = 0.8; // same as #game-container zoom
+    const dpr = window.devicePixelRatio || 1;
+    const adjustedWidth = Math.max(1, rect.width / zoomFactor);
+    const adjustedHeight = Math.max(1, rect.height / zoomFactor);
+
+    const backingW = Math.max(1, Math.round(adjustedWidth * dpr));
+    const backingH = Math.max(1, Math.round(adjustedHeight * dpr));
+
+    canvas.width = backingW;
+    canvas.height = backingH;
+    canvas.style.width = `${adjustedWidth}px`;
+    canvas.style.height = `${adjustedHeight}px`;
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    const cellW = Math.floor(adjustedWidth / 4);
+    const cellH = Math.floor(adjustedHeight / 4);
 
     // background
     ctx.fillStyle = lightsOn ? '#ffffff' : '#111111';
-    ctx.fillRect(0, 0, cssWidth, cssHeight);
+    ctx.fillRect(0, 0, adjustedWidth, adjustedHeight);
     // Prefer crisp rendering for this grid
     ctx.imageSmoothingEnabled = false;
 

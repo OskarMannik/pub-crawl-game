@@ -320,11 +320,16 @@ function drawMap() {
     if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
+    const zoomFactor = 0.8;
     const dpr = window.devicePixelRatio || 1;
-    canvas.width = Math.max(1, Math.round(rect.width * dpr));
-    canvas.height = Math.max(1, Math.round(rect.height * dpr));
-    canvas.style.width = rect.width + 'px';
-    canvas.style.height = rect.height + 'px';
+
+    const adjustedWidth = rect.width / zoomFactor;
+    const adjustedHeight = rect.height / zoomFactor;
+
+    canvas.width = Math.max(1, Math.round(adjustedWidth * dpr));
+    canvas.height = Math.max(1, Math.round(adjustedHeight * dpr));
+    canvas.style.width = adjustedWidth + 'px';
+    canvas.style.height = adjustedHeight + 'px';
 
     const ctx = canvas.getContext('2d');
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -332,7 +337,7 @@ function drawMap() {
     try { ctx.imageSmoothingQuality = 'high'; } catch (e) {}
 
     const token = ++gameState.imageLoadToken;
-    ctx.clearRect(0, 0, rect.width, rect.height);
+    ctx.clearRect(0, 0, adjustedWidth, adjustedHeight);
 
     const img = new Image();
     img.onload = function() {
@@ -340,18 +345,18 @@ function drawMap() {
         const naturalW = img.naturalWidth || img.width;
         const naturalH = img.naturalHeight || img.height;
 
-        const coverScale = Math.max(rect.width / naturalW, rect.height / naturalH);
+        const coverScale = Math.max(adjustedWidth / naturalW, adjustedHeight / naturalH);
         const scale = Math.min(1, coverScale * 0.95);
 
         const drawW = Math.round(naturalW * scale);
         const drawH = Math.round(naturalH * scale);
-        const x = Math.round((rect.width - drawW) / 2);
-        const y = Math.round((rect.height - drawH) / 2);
+        const x = Math.round((adjustedWidth - drawW) / 2);
+        const y = Math.round((adjustedHeight - drawH) / 2);
 
-        ctx.clearRect(0, 0, rect.width, rect.height);
+        ctx.clearRect(0, 0, adjustedWidth, adjustedHeight);
         ctx.drawImage(img, 0, 0, naturalW, naturalH, x, y, drawW, drawH);
     };
-    
+
     img.src = 'images/map.png';
 
 }
@@ -570,7 +575,7 @@ function startTomGameAtAmazon() {
 
     gameState.waitingForTaskResponse = false;
     gameState.inTomGame = true;
-    
+
     if (typeof lightsOn !== 'undefined') lightsOn = false;
     if (typeof keyFound !== 'undefined') keyFound = false;
     if (typeof exitOpen !== 'undefined') exitOpen = false;
@@ -586,13 +591,22 @@ function startTomGameAtAmazon() {
         ];
     }
 
-    // show instructions and initial canvas render
     typeWriter("\nStarting mini-game: use `up`, `down`, `left`, `right` to move and `hit` to interact. Type `quit` to exit the mini-game.\n");
-    // save current canvas state so we can restore it after quitting
     try {
         const canvas = document.getElementById('map');
         if (canvas && canvas.getContext) {
+            const rect = canvas.getBoundingClientRect();
+            const zoomFactor = 0.8;
+            const dpr = window.devicePixelRatio || 1;
+            const adjustedWidth = rect.width / zoomFactor;
+            const adjustedHeight = rect.height / zoomFactor;
+
             const ctx = canvas.getContext('2d');
+            canvas.width = Math.max(1, Math.round(adjustedWidth * dpr));
+            canvas.height = Math.max(1, Math.round(adjustedHeight * dpr));
+            canvas.style.width = `${adjustedWidth}px`;
+            canvas.style.height = `${adjustedHeight}px`;
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
             gameState.tomCanvasBackup = ctx.getImageData(0, 0, canvas.width, canvas.height);
         }
     } catch (e) {
@@ -606,13 +620,24 @@ function startTomGameAtAmazon() {
 function stopTomGame() {
     gameState.inTomGame = false;
     typeWriter("\nExiting mini-game. You may continue exploring.\n");
-    // restore prior canvas snapshot if we saved one
     try {
         const canvas = document.getElementById('map');
         if (canvas && canvas.getContext && gameState.tomCanvasBackup) {
+            const rect = canvas.getBoundingClientRect();
+            const zoomFactor = 0.8; 
+            const dpr = window.devicePixelRatio || 1;
+            const adjustedWidth = rect.width / zoomFactor;
+            const adjustedHeight = rect.height / zoomFactor;
+
             const ctx = canvas.getContext('2d');
+            canvas.width = Math.max(1, Math.round(adjustedWidth * dpr));
+            canvas.height = Math.max(1, Math.round(adjustedHeight * dpr));
+            canvas.style.width = `${adjustedWidth}px`;
+            canvas.style.height = `${adjustedHeight}px`;
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
             ctx.putImageData(gameState.tomCanvasBackup, 0, 0);
             delete gameState.tomCanvasBackup;
+            drawMap();
             return;
         }
     } catch (e) {
@@ -621,6 +646,7 @@ function stopTomGame() {
 
     // fallback: clear canvas area to avoid showing lingering state
     displayTaskImage(null);
+    drawMap();
 }
 
 function typeWriter(text, speed = 6) {
@@ -801,7 +827,6 @@ function handleCommand(command) {
                 }
             }
         } else {
-            // NEW VERSION: Handle text input answers (including shorttermmemory with multiple acceptable answers)
             const correct = currentQuestion.correct;
             let matched = false;
 
@@ -874,7 +899,7 @@ function handleCommand(command) {
                 if (!gameState.completedPubs.includes(locations[gameState.location].name)) {
                     gameState.completedPubs.push(locations[gameState.location].name);
                 }
-                typeWriter(`\nTask completed! You answered ${gameState.tasksCompleted}/${gameState.totalTasksInPub} correctly. Total Score: ${Math.round(gameState.score)}\n\nAvailable commands:\n- up, down, left, right: Move in that direction\n- time: Check remaining time\n- help: show commands\n`);
+                typeWriter(`\nTask completed! You answered ${gameState.tasksCompleted} correctly. Total Score: ${Math.round(gameState.score)}\n\nAvailable commands:\n- up, down, left, right: Move in that direction\n- time: Check remaining time\n- help: show commands\n`);
                 gameState.inTask = false;
                 gameState.currentQuestionMode = null;
                 gameState.tasksCompleted = 0;
@@ -897,10 +922,24 @@ function handleCommand(command) {
         return;
     }
 
-    // If we're inside Tom's mini-game, route commands to its processor
     if (gameState.inTomGame) {
-        // allow quitting the mini-game
         if (cmd === 'quit' || cmd === 'exit') {
+            const result = {
+                pub: 'Bar Amazon',
+                question: 'learning mini-game',
+                userAnswer: 'quit',
+                correctAnswer: 'completed',
+                isCorrect: false
+            };
+            gameState.taskResults.push(result);
+
+            if (typeof saveAnswer === 'function' && gameState.sessionId) {
+                saveAnswer(gameState.sessionId, result.pub, result.question, result.userAnswer, result.correctAnswer, result.isCorrect);
+                if (typeof updateGameSession === 'function') {
+                    updateGameSession(gameState.sessionId, gameState.score, gameState.totalCorrectAnswers, gameState.taskResults.length, gameState.timeElapsed, false);
+                }
+            }
+
             stopTomGame();
             return;
         }
