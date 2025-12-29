@@ -476,8 +476,6 @@ function startShortTermMemoryTask() {
         viewStartTime: Date.now(),
         viewTotalTime: 0,
         shuffledQuestions: [],
-        // DEPRECATED: shuffledChoices only used in old version with multiple choice
-        // shuffledChoices: [],
         userAnswers: []
     };
 
@@ -745,6 +743,14 @@ function movePlayer(direction) {
 function showNextQuestion() {
     const question = gameState.currentTaskQuestions[gameState.currentQuestionIndex];
     displayTaskImage(question.image, question.image ? question.question : null, question.answers);
+
+    if (gameState.location === 'finish') {
+        const output = document.getElementById("output");
+        if (output) {
+            output.textContent = "";
+        }
+        drawMap();
+    }
 
     const isShortTermMemoryQuestion = Array.isArray(question.correct) && question.correct.length > 0;
     
