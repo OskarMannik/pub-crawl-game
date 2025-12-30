@@ -574,23 +574,18 @@ function startTomGameAtAmazon() {
     gameState.waitingForTaskResponse = false;
     gameState.inTomGame = true;
 
-    if (typeof lightsOn !== 'undefined') lightsOn = false;
-    if (typeof keyFound !== 'undefined') keyFound = false;
-    if (typeof exitOpen !== 'undefined') exitOpen = false;
-    if (typeof gameWon !== 'undefined') gameWon = false;
-    if (typeof playerX !== 'undefined') playerX = 0;
-    if (typeof playerY !== 'undefined') playerY = 2;
-    if (typeof map !== 'undefined') {
-        map = [
-            ["empty",  "empty",  "switch", "empty"],
-            ["empty",  "empty",  "empty",  "empty"],
-            ["player", "empty",  "empty",  "empty"],
-            ["empty",  "empty",  "exit",   "empty"]
-        ];
-    }
+    typeWriter(
+        "\nStarting mini-game:\n" +
+        "- up, down, left, right: move\n" +
+        "- hit: interact\n" +
+        "- quit: exit the mini-game\n\n"
+    );
 
-    typeWriter("\nStarting mini-game: use `up`, `down`, `left`, `right` to move and `hit` to interact. Type `quit` to exit the mini-game.\n");
-    try {
+    currentLevel = 0;
+    levelsCompleted = 0;
+    loadLevel(currentLevel);
+    
+    /*try {
         const canvas = document.getElementById('map');
         if (canvas && canvas.getContext) {
             const rect = canvas.getBoundingClientRect();
@@ -609,10 +604,10 @@ function startTomGameAtAmazon() {
         }
     } catch (e) {
         console.warn('Could not backup canvas before Tom game', e);
-    }
+    }*/
 
     // draw initial tom game view to canvas
-    try { drawGrid(); } catch (e) {}
+    //try { drawGrid(); } catch (e) {}
 }
 
 function stopTomGame() {
@@ -954,34 +949,6 @@ function handleCommand(command) {
             if (typeof processCommand === 'function') {
                 processCommand(cmd);
                 
-                if (typeof gameWon !== 'undefined' && gameWon) {
-                    if (!gameState.completedPubs.includes('Bar Amazon')) {
-                        gameState.score += gameState.maxScorePerPub;
-                        gameState.completedPubs.push('Bar Amazon');
-                    }
-                    gameState.totalCorrectAnswers++;
-                    typeWriter(`\nYou completed the mini-game!\n`);
-                    
-                    // Log Tom game result
-                    const result = {
-                        pub: 'Bar Amazon',
-                        question: 'learning mini-game',
-                        userAnswer: 'completed',
-                        correctAnswer: 'completed',
-                        isCorrect: true
-                    };
-                    gameState.taskResults.push(result);
-
-                    if (typeof saveAnswer === 'function' && gameState.sessionId) {
-                        saveAnswer(gameState.sessionId, result.pub, result.question, result.userAnswer, result.correctAnswer, result.isCorrect);
-                        if (typeof updateGameSession === 'function') {
-                            updateGameSession(gameState.sessionId, gameState.score, gameState.totalCorrectAnswers, gameState.taskResults.length, gameState.timeElapsed, false);
-                        }
-                    }
-
-                    stopTomGame();
-                    return;
-                }
             }
         } catch (e) {
             console.error('Mini-game command error', e);
@@ -997,6 +964,7 @@ function handleCommand(command) {
             } else if (gameState.location === 'bar_amazon') {
                 // start Tom's mini-game integration at Bar Amazon
                 startTomGameAtAmazon();
+                return;
             } else {
                 gameState.waitingForTaskResponse = false;
                 const currentLocation = locations[gameState.location];

@@ -30,8 +30,6 @@ body {
 /* GRID */
 #game-area {
     display: grid;
-    grid-template-columns: repeat(4, 80px);
-    grid-template-rows: repeat(4, 80px);
     gap: 6px;
 }
 
@@ -143,4 +141,18 @@ body {
 .exit-icon.open {
     transform: rotate(60deg);
     /*background: green !important;*/
+}
+
+/* Sammude lugeja */
+#steps-bar {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.step-box {
+    width: 20px;
+    height: 20px;
+    background: limegreen;
+    border-radius: 4px;
 }

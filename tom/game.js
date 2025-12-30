@@ -1,31 +1,99 @@
-// 4x4 leveli kaart
-let map = [
-    ["empty",  "empty",  "switch", "empty"],
-    ["empty",  "empty",  "empty",  "empty"],
-    ["player", "empty",  "empty",  "empty"],
-    ["empty",  "empty",  "exit",   "empty"]
+//levelid
+const levels = [
+    {
+        size: 3,
+        switches: 1,
+        boxes: 4,
+        map: [
+            ["empty", "switch", "empty"],
+            ["empty", "player", "empty"],
+            ["empty", "empty", "exit"]
+        ]
+    },
+    {
+        size: 4, 
+        switches: 1, 
+        boxes: 6,
+        map: [
+            ["empty",  "empty",  "switch", "empty"],
+            ["empty",  "empty",  "empty",  "empty"],
+            ["player", "empty",  "empty",  "empty"],
+            ["empty",  "empty",  "exit",   "empty"]
+        ]
+    },
+    {
+        size: 5, 
+        switches: 2, 
+        boxes: 8,
+        map: [
+            ["empty",  "empty",  "switch", "exit"],
+            ["empty",  "empty",  "empty",  "empty"],
+            ["switch", "empty",  "empty",  "empty"],
+            ["empty",  "empty",  "empty",   "empty"],
+            ["empty",  "player",  "empty", "empty"]
+        ]
+    }
 ];
 
-let playerX = 0;
-let playerY = 2;
+let currentLevel = 0;
+let gridSize = levels[currentLevel].size;
+let map = [];
+let switchesHit = 0;
+
+let steps = 0;
+const maxBoxes = 5;
+let boxesLeft = maxBoxes;
+
+let tomFailed = false;
 
 let lightsOn = false;
 let keyFound = false;
 let exitOpen = false;
 let gameWon = false;
 
-//const log = document.getElementById("log");
+let levelsCompleted = 0;
 
-// LOG FUNKTSIOON
-/*
-function writeLog(msg) {
-    log.innerHTML += msg + "<br>";
-    log.scrollTop = log.scrollHeight;
-}*/
+// Leveli laadimine
+function loadLevel(levelIndex) {
+    const level = levels[levelIndex];
 
-// GRIDI JOONISTAMINE
-function drawGrid() {
+    gridSize = level.size;
+    map = JSON.parse(JSON.stringify(level.map));
+
+    steps = 0;
+    boxesLeft = level.boxes;
+
+    lightsOn = false;
+    keyFound = false;
+    exitOpen = false;
+    gameWon = false;
+    switchesHit = 0;
+    tomFailed = false;
+
+    for (let y = 0; y < gridSize; y++) {
+        for (let x = 0; x < gridSize; x++) {
+            if (map[y][x] === "player") {
+                playerX = x;
+                playerY = y;
+                map[y][x] = "empty";
+            }
+        }  
+    }
+
+    //updateGridCSS();
+    drawGrid();
+}
+
+//CSS uuendamine
+function updateGridCSS() {
     const area = document.getElementById("game-area");
+    area.style.gridTemplateColumns = `repeat(${gridSize}, 80px)`;
+    area.style.gridTemplateRows = `repeat(${gridSize}, 80px)`;
+}
+
+// Gridi joonistamine
+function drawGrid() {
+    /*const area = document.getElementById("game-area");
 
     // If running embedded in the main game page `#game-area` may be absent.
     // Only update DOM if the element exists; always update the main canvas view.
@@ -38,8 +106,8 @@ function drawGrid() {
             area.classList.remove("lights-on");
         }
 
-        for (let y = 0; y < 4; y++) {
-            for (let x = 0; x < 4; x++) {
+        for (let y = 0; y < gridSize; y++) {
+            for (let x = 0; x < gridSize; x++) {
 
                 const cell = document.createElement("div");
                 cell.classList.add("cell");
@@ -84,13 +152,30 @@ function drawGrid() {
         }
     }
 
+    drawSteps();
     // Always update canvas view so integrations can render the game to the main `#map` canvas.
-    try { drawGridToCanvas(); } catch (e) {}
+    try { drawGridToCanvas(); } catch (e) {}*/
+    drawGridToCanvas();
+}
+
+//Kuva sammud
+function drawSteps() {
+    const bar = document.getElementById("steps-bar");
+    bar.innerHTML = "";
+
+    for (let i = 0; i < boxesLeft; i++) {
+        const box = document.createElement("div");
+        box.className = "step-box";
+        bar.appendChild(box);
+        
+    }
 }
 
 // Also render a simplified view to the main canvas (`#map`) when present.
 function drawGridToCanvas() {
     const canvas = document.getElementById('map');
+    const uiHeight = 40;
+
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     // Match main game scaling: account for zoom and HiDPI
@@ -110,19 +195,26 @@ function drawGridToCanvas() {
 
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    const cellW = Math.floor(adjustedWidth / 4);
-    const cellH = Math.floor(adjustedHeight / 4);
+    const cellW = Math.floor(adjustedWidth / gridSize);
+    const cellH = Math.floor((adjustedHeight - uiHeight)/ gridSize);
 
     // background
     ctx.fillStyle = lightsOn ? '#ffffff' : '#111111';
     ctx.fillRect(0, 0, adjustedWidth, adjustedHeight);
+
+    // steps
+    for (let i = 0; i < boxesLeft; i++) {
+        ctx.fillStyle = '#00ff00';
+        ctx.fillRect(10 + i * 22, 10, 18, 18);
+    }
+
     // Prefer crisp rendering for this grid
     ctx.imageSmoothingEnabled = false;
 
-    for (let y = 0; y < 4; y++) {
-        for (let x = 0; x < 4; x++) {
+    for (let y = 0; y < gridSize; y++) {
+        for (let x = 0; x < gridSize; x++) {
             const cx = x * cellW;
-            const cy = y * cellH;
+            const cy = uiHeight + y * cellH;
 
             // cell background
             ctx.fillStyle = '#222';
@@ -184,12 +276,23 @@ function processCommand(cmd) {
     else return;
 
     // Kontrolli piire
-    if (newX < 0 || newX > 3 || newY < 0 || newY > 3) {
+    if (newX < 0 || newX >= gridSize || newY < 0 || newY >= gridSize) {
         return;
     }
 
     playerX = newX;
     playerY = newY;
+
+    steps++;
+
+    if (steps % 3 === 0) {
+        boxesLeft--;
+        if (boxesLeft <= 0) {
+           gameWon = true;
+           endTomGame(false);
+           return;
+        }
+    }
 
     checkRoom();
     drawGrid();
@@ -198,17 +301,21 @@ function processCommand(cmd) {
 // HIT käsu loogika
 function useHit() {
     if (map[playerY][playerX] === "switch") {
-        lightsOn = true;
+        map[playerY][playerX] = "empty";
+        switchesHit++;
 
-        // leia juhuslik ruut võtme jaoks
-        let placed = false;
-        while (!placed) {
-            let rx = Math.floor(Math.random() * 4);
-            let ry = Math.floor(Math.random() * 4);
+         if (switchesHit === levels[currentLevel].switches) {
+            lightsOn = true;
 
-            if (map[ry][rx] === "empty") {
-                map[ry][rx] = "key";
-                placed = true;
+            // place key
+            let placed = false;
+            while (!placed) {
+                let rx = Math.floor(Math.random() * gridSize);
+                let ry = Math.floor(Math.random() * gridSize);
+                if (map[ry][rx] === "empty") {
+                    map[ry][rx] = "key";
+                    placed = true;
+                }
             }
         }
 
@@ -216,16 +323,43 @@ function useHit() {
         return;
     }
 
-    if (map[playerY][playerX] === "exit") {
-        if (keyFound || exitOpen) {
-            exitOpen = true;
-            gameWon = true;
+    if (map[playerY][playerX] === "exit" && keyFound) {
+        levelsCompleted++;
+        currentLevel++;
+
+        if (currentLevel < levels.length) {
+            loadLevel(currentLevel);
             drawGrid();
-            return;
+        } else {
+            endTomGame(true);
         }
     }
 
     return;
+}
+
+function endTomGame(won) {
+    gameState.inTomGame = false;
+
+    let score = calculateTomScore();
+    
+    if (won) {
+        typeWriter(`\nYou completed ${levelsCompleted} levels! +${score} points\n`);
+    } else {
+        typeWriter(`\nYou ran out of steps. You recieved ${score} points.\n`);
+    }
+
+    gameState.score += score;
+
+    gameState.taskResults.push({
+        pub: 'Bar Amazon',
+        question: 'Tom mini-game',
+        userAnswer: `${levelsCompleted} levels`,
+        correctAnswer: '3 levels',
+        isCorrect: won
+    });
+
+    stopTomGame();
 }
 
 // Kontroll, mis toas ollakse
@@ -245,6 +379,15 @@ if (_cmdEl) {
             this.value = "";
         }
     });
+}
+
+// Arvuta tulemus
+
+function calculateTomScore() {
+    if (levelsCompleted === 1) return 20;
+    if (levelsCompleted === 2) return 50;
+    if (levelsCompleted === 3) return 100;
+    return 0;
 }
 
 // (wrapper removed) drawGrid now calls drawGridToCanvas internally.
