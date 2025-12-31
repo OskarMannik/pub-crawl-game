@@ -55,7 +55,7 @@ const locations = {
     },
     'pub_acropolis': {
         name: 'Pub Acropolis',
-        description: 'You enter an old looking building which from the outside looks peaceful but when you enter, you realise that it is much more alive than you would have guessed. It is a dark room where RGB lights flash and dance around the walls from time to time. In front of you there stands a tall mirror where people check their outfits and make social media pictures. Instead of the mirror your interest is drawn to the long dance floor. There are multiple tall pillars standing around the room and on the left side of the room there is a counter, which is as long as the whole room. The whole wall behind the counter is a mirror and while looking around you realise that the wall facing the counter is also a huge mirror. In one corner of the counter you see a familiar face and instantly know that he will give you your next task. You make your way towards the person.',
+        description: 'You enter an old looking building which from the outside looks peaceful but when you enter, you realise that it is much more alive than you would have guessed. It is a dark room where RGB lights flash and dance around the walls from time to time. In front of you there stands a tall mirror where people check their outfits and make social media pictures. Instead of the mirror your interest is drawn to the long dance floor. There are multiple tall pillars standing around the room and on the left side of the room there is a counter, which is as long as the whole room. The whole wall behind the counter is a mirror and while looking around you realise that the wall facing the counter is also a huge mirror.',
         isPub: true,
         connections: {
             'up': { destination: 'junction1', length: 20 },
@@ -271,6 +271,7 @@ const gameState = {
     completedPubs: [],
     sessionCreationStarted: false,
     isFirstTime: null,
+    timeOutTriggered: false,
 };
 
 function initializeGame() {
@@ -575,7 +576,7 @@ function startTomGameAtAmazon() {
     gameState.inTomGame = true;
 
     typeWriter(
-        "\nStarting mini-game:\n" +
+        "\nStarting mini-game that you have to solve without knowing the rules:\n" +
         "- up, down, left, right: move\n" +
         "- hit: interact\n" +
         "- quit: exit the mini-game\n\n"
@@ -642,7 +643,7 @@ function stopTomGame() {
     drawMap();
 }
 
-function typeWriter(text, speed = 6) {
+function typeWriter(text, speed = 5) {
     // Queue texts so multiple typeWriter calls don't interleave
     const enqueue = (t, s) => {
         gameState.typeQueue.push({ text: t, speed: s });
@@ -700,13 +701,15 @@ function movePlayer(direction) {
         gameState.location = nextLocationKey;
         const newLocation = locations[gameState.location];
         
-        if (gameState.timeElapsed > gameState.maxTime) {
-            gameState.gameOver = true;
-            typeWriter('\nGAME OVER! You ran out of time!\n');
+        if (gameState.timeElapsed > gameState.maxTime && !gameState.timeOutTriggered) {
+            gameState.timeOutTriggered = true;
+            typeWriter('\nTIME IS UP! You ran out of time, but you can continue playing to reach the finish.\n');
             if (typeof updateGameSession === 'function' && gameState.sessionId) {
                 updateGameSession(gameState.sessionId, gameState.score, gameState.totalCorrectAnswers, gameState.taskResults.length, gameState.timeElapsed, false, 'time_out');
             }
-        } else if (gameState.location === 'finish') {
+        }
+
+        if (gameState.location === 'finish') {
             startFinalQuiz();
         } else {
             let desc = '';
@@ -740,10 +743,6 @@ function showNextQuestion() {
     displayTaskImage(question.image, question.image ? question.question : null, question.answers);
 
     if (gameState.location === 'finish') {
-        const output = document.getElementById("output");
-        if (output) {
-            output.textContent = "";
-        }
         drawMap();
     }
 
@@ -924,31 +923,10 @@ function handleCommand(command) {
     }
 
     if (gameState.inTomGame) {
-        if (cmd === 'quit' || cmd === 'exit') {
-            const result = {
-                pub: 'Bar Amazon',
-                question: 'learning mini-game',
-                userAnswer: 'quit',
-                correctAnswer: 'completed',
-                isCorrect: false
-            };
-            gameState.taskResults.push(result);
-
-            if (typeof saveAnswer === 'function' && gameState.sessionId) {
-                saveAnswer(gameState.sessionId, result.pub, result.question, result.userAnswer, result.correctAnswer, result.isCorrect);
-                if (typeof updateGameSession === 'function') {
-                    updateGameSession(gameState.sessionId, gameState.score, gameState.totalCorrectAnswers, gameState.taskResults.length, gameState.timeElapsed, false);
-                }
-            }
-
-            stopTomGame();
-            return;
-        }
         // forward allowed commands to tom's processCommand
         try {
             if (typeof processCommand === 'function') {
                 processCommand(cmd);
-                
             }
         } catch (e) {
             console.error('Mini-game command error', e);
@@ -1057,6 +1035,9 @@ function startFinalQuiz() {
     gameState.totalTasksInPub = finalQuestions.length;
     gameState.isFinalQuiz = true;
     
+    const output = document.getElementById("output");
+    if (output) output.textContent = "";
+
     typeWriter("You have reached the finish! Congratulations! Now, answer these final questions about the pubs you visited to complete the game.\n");
     setTimeout(() => showNextQuestion(), 1000);
 }

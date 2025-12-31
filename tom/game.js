@@ -3,7 +3,7 @@ const levels = [
     {
         size: 3,
         switches: 1,
-        boxes: 4,
+        boxes: 6,
         map: [
             ["empty", "switch", "empty"],
             ["empty", "player", "empty"],
@@ -13,7 +13,7 @@ const levels = [
     {
         size: 4, 
         switches: 1, 
-        boxes: 6,
+        boxes: 8,
         map: [
             ["empty",  "empty",  "switch", "empty"],
             ["empty",  "empty",  "empty",  "empty"],
@@ -24,7 +24,7 @@ const levels = [
     {
         size: 5, 
         switches: 2, 
-        boxes: 8,
+        boxes: 10,
         map: [
             ["empty",  "empty",  "switch", "exit"],
             ["empty",  "empty",  "empty",  "empty"],
@@ -265,6 +265,35 @@ function drawGridToCanvas() {
 function processCommand(cmd) {
     cmd = cmd.toLowerCase().trim();
 
+    if (cmd === "quit" || cmd === "exit") {
+        let score = calculateTomScore();
+        gameState.score += score;
+        
+        typeWriter(`\nYou exited the mini-game. You completed ${levelsCompleted} levels and received ${score} points.\n`);
+
+        const result = {
+            pub: 'Bar Amazon',
+            question: 'Tom mini-game',
+            userAnswer: `${levelsCompleted} levels (quit)`,
+            correctAnswer: '3 levels',
+            isCorrect: false
+        };
+        gameState.taskResults.push(result);
+
+        if (typeof saveAnswer === 'function' && gameState.sessionId) {
+            saveAnswer(gameState.sessionId, result.pub, result.question, result.userAnswer, result.correctAnswer, result.isCorrect);
+        }
+
+        if (typeof updateGameSession === 'function' && gameState.sessionId) {
+            updateGameSession(gameState.sessionId, gameState.score, gameState.totalCorrectAnswers, gameState.taskResults.length, gameState.timeElapsed, false);
+        }
+
+        if (typeof stopTomGame === 'function') {
+            stopTomGame();
+        }
+        return;
+    }
+
     let newX = playerX;
     let newY = playerY;
 
@@ -345,6 +374,7 @@ function endTomGame(won) {
     
     if (won) {
         typeWriter(`\nYou completed ${levelsCompleted} levels! +${score} points\n`);
+        gameState.totalCorrectAnswers++;
     } else {
         typeWriter(`\nYou ran out of steps. You recieved ${score} points.\n`);
     }
@@ -358,6 +388,14 @@ function endTomGame(won) {
         correctAnswer: '3 levels',
         isCorrect: won
     });
+
+    if (typeof saveAnswer === 'function' && gameState.sessionId) {
+        saveAnswer(gameState.sessionId, 'Bar Amazon', 'Tom mini-game', `${levelsCompleted} levels`, '3 levels', won);
+    }
+
+    if (typeof updateGameSession === 'function' && gameState.sessionId) {
+        updateGameSession(gameState.sessionId, gameState.score, gameState.totalCorrectAnswers, gameState.taskResults.length, gameState.timeElapsed, false);
+    }
 
     stopTomGame();
 }
@@ -384,10 +422,14 @@ if (_cmdEl) {
 // Arvuta tulemus
 
 function calculateTomScore() {
-    if (levelsCompleted === 1) return 20;
-    if (levelsCompleted === 2) return 50;
-    if (levelsCompleted === 3) return 100;
+    if (levelsCompleted === 1) {
+        return 20;
+    }
+    if (levelsCompleted === 2) {
+        return 50;
+    }
+    if (levelsCompleted === 3) {
+        return 100;
+    }
     return 0;
 }
-
-// (wrapper removed) drawGrid now calls drawGridToCanvas internally.
