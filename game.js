@@ -272,6 +272,7 @@ const gameState = {
     sessionCreationStarted: false,
     isFirstTime: null,
     timeOutTriggered: false,
+    playerName: null,
 };
 
 function initializeGame() {
@@ -289,7 +290,7 @@ function initializeGame() {
             // create session
             if (!gameState.sessionId && !gameState.sessionCreationStarted && typeof createGameSession === 'function') {
                 gameState.sessionCreationStarted = true;
-                createGameSession(gameState.playerType, gameState.isFirstTime).then(id => gameState.sessionId = id);
+                createGameSession(gameState.playerType, gameState.isFirstTime, gameState.playerName).then(id => gameState.sessionId = id);
             }
 
             handleCommand(command);
@@ -1047,6 +1048,8 @@ window.onload = function() {
     const questionContainer = document.getElementById('question-container');
     const yesBtn = document.getElementById('yes-btn');
     const noBtn = document.getElementById('no-btn');
+    const nameContainer = document.getElementById('name-container');
+    const finalStartBtn = document.getElementById('final-start-btn');
 
     if (startBtn) {
         startBtn.addEventListener('click', function() {
@@ -1054,17 +1057,30 @@ window.onload = function() {
             questionContainer.style.display = 'block';
         });
 
-        const startGame = (isFirstTime) => {
-            questionContainer.style.display = 'none';
-            document.getElementById('game-container').style.display = 'flex';
-
+        const showNameInput = (isFirstTime) => {
             gameState.isFirstTime = isFirstTime;
+            questionContainer.style.display = 'none';
+            nameContainer.style.display = 'block';
+        };
+
+        const startGame = () => {
+            const nameInput = document.getElementById('player-name');
+            if (nameInput) {
+                gameState.playerName = nameInput.value.trim() || null;
+            }
+            
+            nameContainer.style.display = 'none';
+            document.getElementById('game-container').style.display = 'flex';
 
             initializeGame();
         };
 
-        yesBtn.addEventListener('click', () => startGame(true));
-        noBtn.addEventListener('click', () => startGame(false));
+        yesBtn.addEventListener('click', () => showNameInput(true));
+        noBtn.addEventListener('click', () => showNameInput(false));
+        
+        if (finalStartBtn) {
+            finalStartBtn.addEventListener('click', startGame);
+        }
     } else {
         initializeGame();
     }
